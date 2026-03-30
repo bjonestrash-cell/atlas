@@ -41,6 +41,14 @@ cron.schedule('0 8 * * *', async () => {
   console.log('[CRON] Price alert check complete.');
 });
 
+// Serve static frontend in production
+const path = require('path');
+const clientDist = path.join(__dirname, '../client/dist');
+app.use(express.static(clientDist));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientDist, 'index.html'));
+});
+
 // Initialize DB then start server
 initDb().then(() => {
   app.listen(PORT, () => {
