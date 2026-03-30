@@ -47,7 +47,7 @@ export default function Alerts() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-display font-bold text-atlas-text">Alerts & Optimization</h1>
+        <h1 className="font-display text-5xl tracking-wider text-atlas-text">ALERTS</h1>
         <button onClick={() => setShowModal(true)} className="btn-primary">+ Price Alert</button>
       </div>
 

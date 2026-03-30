@@ -45,11 +45,10 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-display font-bold text-atlas-text">Dashboard</h1>
-        <span className="text-sm text-atlas-muted">{YEAR} Travel Journal</span>
+        <h1 className="font-display text-5xl tracking-wider text-atlas-text">DASHBOARD</h1>
+        <span className="font-heading font-semibold text-sm uppercase tracking-wider text-atlas-muted">{YEAR} Travel Journal</span>
       </div>
 
-      {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard label="Total Trips" value={trips.length} sub={`${upcomingTrips.length} upcoming`} />
         <StatCard label="Total Points" value={formatPoints(totalPoints)} accent />
@@ -61,9 +60,8 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Annual Calendar */}
       <div className="card">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-atlas-muted mb-4">Annual Calendar</h2>
+        <h2 className="font-display text-2xl tracking-wider text-atlas-text mb-4">ANNUAL CALENDAR</h2>
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
           {MONTHS.map((m, i) => {
             const monthTrips = tripsByMonth[m] || [];
@@ -75,7 +73,7 @@ export default function Dashboard() {
                   isCurrentMonth ? 'border-atlas-accent bg-atlas-accent/5' : 'border-atlas-border bg-atlas-bg/50'
                 }`}
               >
-                <div className="text-xs font-semibold text-atlas-muted mb-2">{MONTH_LABELS[i]}</div>
+                <div className="font-heading font-semibold text-xs uppercase tracking-wider text-atlas-muted mb-2">{MONTH_LABELS[i]}</div>
                 {monthTrips.length === 0 ? (
                   <div className="text-xs text-atlas-border">No trips</div>
                 ) : (
@@ -99,11 +97,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Upcoming Trips */}
       <div className="card">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-atlas-muted">Upcoming Trips</h2>
-          <Link to="/destinations" className="text-xs text-atlas-accent hover:underline">View all</Link>
+          <h2 className="font-display text-2xl tracking-wider text-atlas-text">UPCOMING TRIPS</h2>
+          <Link to="/destinations" className="font-heading font-semibold text-xs uppercase tracking-wider text-atlas-accent hover:underline">View all</Link>
         </div>
         {upcomingTrips.length === 0 ? (
           <p className="text-atlas-muted text-sm">No upcoming trips planned.</p>
@@ -112,14 +109,14 @@ export default function Dashboard() {
             {upcomingTrips.slice(0, 5).map((t) => (
               <div key={t.id} className="flex items-center justify-between p-3 rounded-lg bg-atlas-bg/60 border border-atlas-border">
                 <div>
-                  <div className="font-medium text-atlas-text">{t.destination}</div>
+                  <div className="font-heading font-semibold text-atlas-text">{t.destination}</div>
                   <div className="text-xs text-atlas-muted">
                     {formatDateShort(t.start_date)} – {formatDateShort(t.end_date)} · {t.airline || 'No airline'}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`text-xs font-semibold uppercase ${STATUS_COLORS[t.status]}`}>{t.status}</span>
-                  <span className="text-sm font-display font-bold text-atlas-accent">{daysUntil(t.start_date)}d</span>
+                  <span className={`font-heading font-semibold text-xs uppercase tracking-wider ${STATUS_COLORS[t.status]}`}>{t.status}</span>
+                  <span className="font-display text-2xl text-atlas-gold">{daysUntil(t.start_date)}d</span>
                 </div>
               </div>
             ))}

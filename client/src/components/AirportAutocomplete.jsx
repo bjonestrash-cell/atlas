@@ -138,7 +138,7 @@ export default function AirportAutocomplete({ value, onChange, placeholder, labe
         <div
           ref={listRef}
           className="absolute z-40 top-full left-0 right-0 mt-1 max-h-56 overflow-y-auto rounded-lg border border-atlas-border"
-          style={{ backgroundColor: '#dde8e0', boxShadow: '0 4px 12px rgba(14,31,26,0.12)' }}
+          style={{ backgroundColor: '#dce6ee', boxShadow: '0 4px 12px rgba(26,42,58,0.12)' }}
         >
           {results.map((airport, i) => (
             <div

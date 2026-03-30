@@ -12,7 +12,7 @@ const links = [
 
 export default function Navbar() {
   return (
-    <nav className="bg-atlas-surface border-b border-atlas-border sticky top-0 z-50" style={{ boxShadow: '0 1px 4px rgba(14,31,26,0.08)' }}>
+    <nav className="bg-atlas-surface border-b border-atlas-border sticky top-0 z-50" style={{ boxShadow: '0 1px 3px rgba(26,42,58,0.08)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-14">
           <NavLink to="/" className="flex items-center gap-2">
@@ -21,7 +21,7 @@ export default function Navbar() {
               <ellipse cx="16" cy="16" rx="6" ry="14" stroke="currentColor" strokeWidth="1.5"/>
               <line x1="2" y1="16" x2="30" y2="16" stroke="currentColor" strokeWidth="1.5"/>
             </svg>
-            <span className="text-lg font-display font-bold tracking-tight text-atlas-text">Atlas</span>
+            <span className="font-display text-2xl tracking-widest text-atlas-text">ATLAS</span>
           </NavLink>
           <div className="flex items-center gap-1 overflow-x-auto">
             {links.map((link) => (
@@ -30,9 +30,9 @@ export default function Navbar() {
                 to={link.to}
                 end={link.to === '/'}
                 className={({ isActive }) =>
-                  `px-3 py-1.5 text-sm font-medium transition-colors whitespace-nowrap border-b-2 ${
+                  `px-3 py-1.5 font-heading font-semibold text-sm uppercase tracking-wider transition-colors whitespace-nowrap border-b-2 ${
                     isActive
-                      ? 'border-atlas-gold text-atlas-accent'
+                      ? 'border-atlas-accent text-atlas-accent'
                       : 'border-transparent text-atlas-muted hover:text-atlas-text hover:border-atlas-border'
                   }`
                 }

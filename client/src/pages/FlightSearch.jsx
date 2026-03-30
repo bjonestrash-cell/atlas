@@ -143,7 +143,7 @@ export default function FlightSearch() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-display font-bold text-atlas-text">Flight Search</h1>
+        <h1 className="font-display text-5xl tracking-wider text-atlas-text">FLIGHT SEARCH</h1>
         {/* Cash / Points toggle */}
         <div className="flex rounded-lg overflow-hidden border border-atlas-border">
           <button
@@ -163,7 +163,7 @@ export default function FlightSearch() {
       {mode === 'points' && (
         <div className="card !py-3">
           <div className="flex items-center gap-3">
-            <label className="text-xs font-semibold text-atlas-muted uppercase tracking-wider whitespace-nowrap">Pay with</label>
+            <label className="font-heading font-semibold text-xs uppercase tracking-wider text-atlas-muted whitespace-nowrap">Pay with</label>
             <select
               value={selectedProgram}
               onChange={(e) => setSelectedProgram(e.target.value)}
@@ -257,7 +257,7 @@ export default function FlightSearch() {
               <div key={flight.id} className="card flex items-center justify-between gap-4">
                 <div className="flex items-center gap-5 flex-1">
                   <div className="text-center min-w-[80px]">
-                    <div className="text-sm font-bold text-atlas-accent">{flight.airline}</div>
+                    <div className="font-heading font-semibold text-sm text-atlas-accent uppercase tracking-wide">{flight.airline}</div>
                     {flight.flightNumber && <div className="text-xs text-atlas-muted">{flight.flightNumber}</div>}
                     <div className="text-xs text-atlas-sub mt-0.5">
                       {flight.stops === 0 ? 'Nonstop' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}
@@ -276,7 +276,7 @@ export default function FlightSearch() {
                 <div className="text-right shrink-0">
                   {mode === 'points' && pointsNeeded ? (
                     <>
-                      <div className="text-lg font-display font-bold text-atlas-success">{formatPoints(pointsNeeded)} pts</div>
+                      <div className="font-display text-2xl text-atlas-success">{formatPoints(pointsNeeded)} pts</div>
                       <div className="text-xs text-atlas-muted">{formatCurrency(flight.price)} cash</div>
                       {isGoodDeal !== null && (
                         <span className={`text-xs font-semibold ${isGoodDeal ? 'text-atlas-success' : 'text-atlas-danger'}`}>
@@ -287,7 +287,7 @@ export default function FlightSearch() {
                   ) : (
                     <>
                       {flight.price ? (
-                        <div className="text-xl font-display font-bold text-atlas-gold">{formatCurrency(flight.price)}</div>
+                        <div className="font-display text-3xl text-atlas-gold">{formatCurrency(flight.price)}</div>
                       ) : (
                         <div className="text-sm text-atlas-muted">Price N/A</div>
                       )}

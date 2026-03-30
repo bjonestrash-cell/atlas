@@ -38,9 +38,9 @@ const DEFAULT_PROGRAMS = [
 ];
 
 const CAT_CONFIG = {
-  credit_card: { label: 'Credit Cards', color: '#1e5c8a' },
-  airline: { label: 'Airlines', color: '#1a3d32' },
-  hotel: { label: 'Hotels', color: '#4a8c7a' },
+  credit_card: { label: 'Credit Cards', color: '#2c5f8a' },
+  airline: { label: 'Airlines', color: '#3a7a5c' },
+  hotel: { label: 'Hotels', color: '#c8a84b' },
 };
 const CAT_ORDER = ['credit_card', 'airline', 'hotel'];
 
@@ -49,7 +49,7 @@ function parseBal(s) { return parseInt(String(s).replace(/,/g, '')) || 0; }
 
 function SortableCard({ prog, balance, display, onBalanceChange, onBalanceBlur, onBalanceFocus, onExpChange, onExpBlur, onFlyClick, catColor }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: prog.name });
-  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1, borderLeftWidth: '3px', borderLeftColor: catColor, boxShadow: '0 1px 4px rgba(14,31,26,0.08)' };
+  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1, borderLeftWidth: '3px', borderLeftColor: catColor, boxShadow: '0 1px 4px rgba(26,42,58,0.08)' };
   const cashValue = (balance.balance * prog.cpp) / 100;
   const daysLeft = balance.expiration_date ? daysUntil(balance.expiration_date) : null;
   const expiring = daysLeft !== null && daysLeft >= 0 && daysLeft <= 60;
@@ -58,7 +58,7 @@ function SortableCard({ prog, balance, display, onBalanceChange, onBalanceBlur, 
     <div ref={setNodeRef} style={style} className="bg-atlas-surface border border-atlas-border rounded-lg p-4 flex flex-col gap-2">
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
-          <div className="font-display font-semibold text-atlas-text text-sm leading-tight">{prog.name}</div>
+          <div className="font-heading font-semibold text-atlas-text text-sm uppercase tracking-wide leading-tight">{prog.name}</div>
           <div className="text-xs text-atlas-muted">{prog.cpp}¢ per point</div>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
@@ -71,7 +71,7 @@ function SortableCard({ prog, balance, display, onBalanceChange, onBalanceBlur, 
         </div>
       </div>
       <div className="flex items-center gap-3">
-        <input type="text" inputMode="numeric" value={display} onChange={(e) => onBalanceChange(prog.name, e.target.value)} onBlur={() => onBalanceBlur(prog.name)} onFocus={(e) => { onBalanceFocus(prog.name); e.target.select(); }} placeholder="0" className="flex-1 text-lg font-display font-semibold !py-1.5" style={{ minWidth: 0 }} />
+        <input type="text" inputMode="numeric" value={display} onChange={(e) => onBalanceChange(prog.name, e.target.value)} onBlur={() => onBalanceBlur(prog.name)} onFocus={(e) => { onBalanceFocus(prog.name); e.target.select(); }} placeholder="0" className="flex-1 text-lg font-heading font-semibold !py-1.5" style={{ minWidth: 0 }} />
         {balance.balance > 0 && <div className="text-sm font-semibold text-atlas-success whitespace-nowrap">≈ {formatCurrency(cashValue)}</div>}
       </div>
       <div className="flex items-center gap-2">
@@ -182,7 +182,7 @@ export default function PointsManager() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-display font-bold text-atlas-text">Points Portfolio</h1>
+        <h1 className="font-display text-5xl tracking-wider text-atlas-text">POINTS PORTFOLIO</h1>
         {lastUpdated && <p className="text-xs text-atlas-muted mt-1">Last updated {new Date(lastUpdated).toLocaleString()}</p>}
       </div>
 
@@ -190,7 +190,7 @@ export default function PointsManager() {
       <div className="card">
         <div className="text-center mb-5">
           <div className="stat-label mb-1">Total Portfolio Value</div>
-          <div className="text-4xl font-display font-bold text-atlas-gold">{formatCurrency(totals.total)}</div>
+          <div className="font-display text-6xl text-atlas-gold">{formatCurrency(totals.total)}</div>
           <div className="text-sm text-atlas-muted mt-1">{formatPoints(totals.totalPoints)} points across {DEFAULT_PROGRAMS.length} programs</div>
         </div>
 

@@ -43,7 +43,7 @@ export default function Optimizer() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-display font-bold text-atlas-text">Points vs. Cash Optimizer</h1>
+      <h1 className="font-display text-5xl tracking-wider text-atlas-text">POINTS VS. CASH</h1>
 
       <div className="card">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-atlas-muted mb-4">Trip Details</h2>
@@ -88,7 +88,7 @@ export default function Optimizer() {
                 {analysis.recommendation === 'points' ? '★' : '$'}
               </div>
               <div>
-                <div className="text-lg font-display font-bold text-atlas-text">
+                <div className="font-display text-2xl text-atlas-text">
                   Recommendation: Use {analysis.recommendation === 'points' ? 'Points' : 'Cash'}
                 </div>
                 <div className="text-sm text-atlas-sub">
