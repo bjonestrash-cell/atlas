@@ -11,17 +11,17 @@ export default function Modal({ open, onClose, title, children }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-atlas-surface border border-atlas-border rounded-lg max-w-lg w-full mx-4 max-h-[85vh] overflow-y-auto" style={{ boxShadow: '0 4px 16px rgba(26,42,58,0.14)' }}>
-        <div className="flex items-center justify-between p-5 border-b border-atlas-border">
-          <h2 className="font-display text-2xl tracking-wider text-atlas-text">{title}</h2>
-          <button onClick={onClose} className="text-atlas-muted hover:text-atlas-text transition-colors">
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-card max-w-lg w-full mx-4 max-h-[85vh] overflow-y-auto" style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
+        <div className="flex items-center justify-between p-6 border-b border-atlas-border">
+          <h2 className="text-lg font-bold text-atlas-text">{title}</h2>
+          <button onClick={onClose} className="text-atlas-muted hover:text-atlas-text transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-atlas-bg">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        <div className="p-5">{children}</div>
+        <div className="p-6">{children}</div>
       </div>
     </div>
   );

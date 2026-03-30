@@ -43,7 +43,7 @@ export default function Optimizer() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-5xl tracking-wider text-atlas-text">POINTS VS. CASH</h1>
+      <h1 className="text-3xl font-bold text-atlas-text">Points vs. Cash</h1>
 
       <div className="card">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-atlas-muted mb-4">Trip Details</h2>

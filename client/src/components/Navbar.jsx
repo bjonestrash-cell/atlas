@@ -12,16 +12,18 @@ const links = [
 
 export default function Navbar() {
   return (
-    <nav className="bg-atlas-surface border-b border-atlas-border sticky top-0 z-50" style={{ boxShadow: '0 1px 3px rgba(26,42,58,0.08)' }}>
+    <nav className="bg-white border-b border-atlas-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-14">
-          <NavLink to="/" className="flex items-center gap-2">
-            <svg className="w-6 h-6 text-atlas-accent" viewBox="0 0 32 32" fill="none">
-              <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2"/>
-              <ellipse cx="16" cy="16" rx="6" ry="14" stroke="currentColor" strokeWidth="1.5"/>
-              <line x1="2" y1="16" x2="30" y2="16" stroke="currentColor" strokeWidth="1.5"/>
-            </svg>
-            <span className="font-display text-2xl tracking-widest text-atlas-text">ATLAS</span>
+        <div className="flex items-center justify-between h-16">
+          <NavLink to="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-atlas-green flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <ellipse cx="12" cy="12" rx="4" ry="10" />
+              </svg>
+            </div>
+            <span className="text-xl font-extrabold text-atlas-text tracking-tight">Atlas</span>
           </NavLink>
           <div className="flex items-center gap-1 overflow-x-auto">
             {links.map((link) => (
@@ -30,14 +32,19 @@ export default function Navbar() {
                 to={link.to}
                 end={link.to === '/'}
                 className={({ isActive }) =>
-                  `px-3 py-1.5 font-heading font-semibold text-sm uppercase tracking-wider transition-colors whitespace-nowrap border-b-2 ${
-                    isActive
-                      ? 'border-atlas-accent text-atlas-accent'
-                      : 'border-transparent text-atlas-muted hover:text-atlas-text hover:border-atlas-border'
+                  `relative px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
+                    isActive ? 'font-semibold text-atlas-text' : 'text-atlas-muted hover:text-atlas-text'
                   }`
                 }
               >
-                {link.label}
+                {({ isActive }) => (
+                  <>
+                    {link.label}
+                    {isActive && (
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-atlas-green" />
+                    )}
+                  </>
+                )}
               </NavLink>
             ))}
           </div>

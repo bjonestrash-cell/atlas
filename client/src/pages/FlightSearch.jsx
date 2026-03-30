@@ -28,7 +28,7 @@ function getHour(timeStr) {
 
 function inTimeRange(hour, range) {
   if (range[0] < range[1]) return hour >= range[0] && hour < range[1];
-  return hour >= range[0] || hour < range[1]; // wraps midnight
+  return hour >= range[0] || hour < range[1];
 }
 
 export default function FlightSearch() {
@@ -44,24 +44,20 @@ export default function FlightSearch() {
   const [saved, setSaved] = useState(null);
   const returnRef = useRef(null);
 
-  // Filters
   const [nonstopOnly, setNonstopOnly] = useState(false);
   const [maxPrice, setMaxPrice] = useState('');
   const [airlineFilter, setAirlineFilter] = useState({});
   const [timeFilter, setTimeFilter] = useState('');
   const [sortBy, setSortBy] = useState('price');
 
-  // Points mode
   const [mode, setMode] = useState('cash');
   const [pointsPrograms, setPointsPrograms] = useState([]);
   const [selectedProgram, setSelectedProgram] = useState('');
 
-  // Load points programs for points mode
   useEffect(() => {
     api.getPoints().then((progs) => {
       setPointsPrograms(progs.filter((p) => p.balance > 0));
     });
-    // Check if pre-selected from Points page
     const preselect = searchParams.get('program');
     if (preselect) {
       setMode('points');
@@ -89,7 +85,6 @@ export default function FlightSearch() {
       const data = await api.searchFlights(params);
       setResults(data);
       if (data.length === 0) setError('No flights found for this route and date.');
-      // Init airline filter with all airlines checked
       const airlines = {};
       data.forEach((f) => { if (f.airline) airlines[f.airline] = true; });
       setAirlineFilter(airlines);
@@ -106,7 +101,6 @@ export default function FlightSearch() {
     if (date) setTimeout(() => returnRef.current?.setOpen(true), 200);
   };
 
-  // Filtered + sorted results
   const filteredResults = useMemo(() => {
     let filtered = results.filter((f) => {
       if (nonstopOnly && f.stops > 0) return false;
@@ -121,54 +115,34 @@ export default function FlightSearch() {
       }
       return true;
     });
-
     filtered.sort((a, b) => {
       if (sortBy === 'price') return (a.price || 9999) - (b.price || 9999);
       if (sortBy === 'duration') return (a.durationMinutes || 9999) - (b.durationMinutes || 9999);
       if (sortBy === 'departure') return (a.departure || '').localeCompare(b.departure || '');
       return 0;
     });
-
     return filtered;
   }, [results, nonstopOnly, maxPrice, airlineFilter, timeFilter, sortBy]);
 
-  const uniqueAirlines = useMemo(() => {
-    return [...new Set(results.map((f) => f.airline).filter(Boolean))];
-  }, [results]);
+  const uniqueAirlines = useMemo(() => [...new Set(results.map((f) => f.airline).filter(Boolean))], [results]);
 
-  const toggleAirline = (airline) => {
-    setAirlineFilter((f) => ({ ...f, [airline]: !f[airline] }));
-  };
+  const toggleAirline = (airline) => setAirlineFilter((f) => ({ ...f, [airline]: !f[airline] }));
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-5xl tracking-wider text-atlas-text">FLIGHT SEARCH</h1>
-        {/* Cash / Points toggle */}
-        <div className="flex rounded-lg overflow-hidden border border-atlas-border">
-          <button
-            type="button"
-            onClick={() => setMode('cash')}
-            className={`px-4 py-1.5 text-sm font-medium transition-colors ${mode === 'cash' ? 'bg-atlas-accent text-white' : 'bg-atlas-surface text-atlas-sub'}`}
-          >Cash</button>
-          <button
-            type="button"
-            onClick={() => setMode('points')}
-            className={`px-4 py-1.5 text-sm font-medium transition-colors ${mode === 'points' ? 'bg-atlas-accent text-white' : 'bg-atlas-surface text-atlas-sub'}`}
-          >Points</button>
+        <h1 className="text-3xl font-bold text-atlas-text">Flights</h1>
+        <div className="flex rounded-btn overflow-hidden border border-atlas-border">
+          <button type="button" onClick={() => setMode('cash')} className={`px-5 py-2 text-sm font-semibold transition-colors ${mode === 'cash' ? 'bg-atlas-accent text-white' : 'bg-white text-atlas-sub'}`}>Cash</button>
+          <button type="button" onClick={() => setMode('points')} className={`px-5 py-2 text-sm font-semibold transition-colors ${mode === 'points' ? 'bg-atlas-accent text-white' : 'bg-white text-atlas-sub'}`}>Points</button>
         </div>
       </div>
 
-      {/* Points program selector */}
       {mode === 'points' && (
-        <div className="card !py-3">
+        <div className="card !py-4">
           <div className="flex items-center gap-3">
-            <label className="font-heading font-semibold text-xs uppercase tracking-wider text-atlas-muted whitespace-nowrap">Pay with</label>
-            <select
-              value={selectedProgram}
-              onChange={(e) => setSelectedProgram(e.target.value)}
-              className="flex-1 text-sm"
-            >
+            <span className="stat-label whitespace-nowrap">Pay with</span>
+            <select value={selectedProgram} onChange={(e) => setSelectedProgram(e.target.value)} className="flex-1">
               <option value="">Select a program...</option>
               {pointsPrograms.map((p) => (
                 <option key={p.program_name} value={p.program_name}>
@@ -181,60 +155,59 @@ export default function FlightSearch() {
       )}
 
       <form onSubmit={handleSearch} className="card">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <AirportAutocomplete value={origin} onChange={setOrigin} placeholder="City or airport code" label="Origin *" />
-          <AirportAutocomplete value={destination} onChange={setDestination} placeholder="City or airport code" label="Destination *" />
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <AirportAutocomplete value={origin} onChange={setOrigin} placeholder="City or code" label="From" />
+          <AirportAutocomplete value={destination} onChange={setDestination} placeholder="City or code" label="To" />
           <div>
-            <label className="block text-xs font-semibold text-atlas-muted mb-1 uppercase tracking-wider">Departure *</label>
+            <label className="stat-label block mb-2">Depart</label>
             <DatePicker selected={departDate} onChange={handleDepartDateChange} minDate={new Date()} placeholderText="Select date" dateFormat="MMM d, yyyy" className="w-full" calendarClassName="atlas-calendar" popperPlacement="bottom-start" />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-atlas-muted mb-1 uppercase tracking-wider">
+            <label className="stat-label block mb-2">
               Return {returnDate && <button type="button" onClick={() => setReturnDate(null)} className="ml-1 text-atlas-danger font-normal normal-case tracking-normal hover:underline">clear</button>}
             </label>
-            <DatePicker ref={returnRef} selected={returnDate} onChange={setReturnDate} minDate={departDate || new Date()} openToDate={departDate || new Date()} placeholderText={departDate ? 'Select return' : 'Pick departure first'} dateFormat="MMM d, yyyy" className="w-full" calendarClassName="atlas-calendar" popperPlacement="bottom-start" disabled={!departDate} />
+            <DatePicker ref={returnRef} selected={returnDate} onChange={setReturnDate} minDate={departDate || new Date()} openToDate={departDate || new Date()} placeholderText={departDate ? 'Select return' : 'Pick depart first'} dateFormat="MMM d, yyyy" className="w-full" calendarClassName="atlas-calendar" popperPlacement="bottom-start" disabled={!departDate} />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-atlas-muted mb-1 uppercase tracking-wider">Cabin</label>
+            <label className="stat-label block mb-2">Cabin</label>
             <select value={cabinClass} onChange={(e) => setCabinClass(e.target.value)} className="w-full">
               {CABIN_CLASSES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
           </div>
         </div>
-        <button type="submit" disabled={loading || !origin || !destination || !departDate} className="btn-primary mt-4">
+        <button type="submit" disabled={loading || !origin || !destination || !departDate} className="btn-primary mt-5 w-full md:w-auto">
           {loading ? 'Searching...' : 'Search Flights'}
         </button>
       </form>
 
       {error && (
-        <div className="card border-atlas-danger/30 bg-atlas-danger/5">
-          <p className="text-atlas-danger text-sm">{error}</p>
+        <div className="card !bg-red-50">
+          <p className="text-atlas-danger text-sm font-medium">{error}</p>
         </div>
       )}
 
-      {/* Filter bar */}
       {results.length > 0 && (
-        <div className="card !py-3 flex flex-wrap items-center gap-3">
-          <label className="flex items-center gap-1.5 text-sm text-atlas-sub cursor-pointer">
-            <input type="checkbox" checked={nonstopOnly} onChange={(e) => setNonstopOnly(e.target.checked)} className="!w-4 !h-4 !p-0 rounded" />
+        <div className="card !py-4 flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-2 text-sm text-atlas-sub cursor-pointer">
+            <input type="checkbox" checked={nonstopOnly} onChange={(e) => setNonstopOnly(e.target.checked)} className="!w-4 !h-4 !p-0 !rounded-md accent-atlas-accent" />
             Nonstop only
           </label>
-          <div className="h-4 w-px bg-atlas-border" />
-          <select value={timeFilter} onChange={(e) => setTimeFilter(e.target.value)} className="text-xs !py-1">
+          <div className="h-5 w-px bg-atlas-border" />
+          <select value={timeFilter} onChange={(e) => setTimeFilter(e.target.value)} className="text-sm !py-2">
             <option value="">Any time</option>
             {TIME_RANGES.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
           </select>
-          <input type="number" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} placeholder="Max price" className="text-xs !py-1 w-24" />
-          <div className="h-4 w-px bg-atlas-border" />
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="text-xs !py-1">
-            <option value="price">Sort: Price</option>
-            <option value="duration">Sort: Duration</option>
-            <option value="departure">Sort: Departure</option>
+          <input type="number" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} placeholder="Max $" className="text-sm !py-2 w-24" />
+          <div className="h-5 w-px bg-atlas-border" />
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="text-sm !py-2">
+            <option value="price">Price ↑</option>
+            <option value="duration">Duration ↑</option>
+            <option value="departure">Departure ↑</option>
           </select>
-          <div className="h-4 w-px bg-atlas-border" />
+          <div className="h-5 w-px bg-atlas-border" />
           {uniqueAirlines.map((al) => (
-            <label key={al} className="flex items-center gap-1 text-xs text-atlas-sub cursor-pointer">
-              <input type="checkbox" checked={airlineFilter[al] !== false} onChange={() => toggleAirline(al)} className="!w-3.5 !h-3.5 !p-0 rounded" />
+            <label key={al} className="flex items-center gap-1.5 text-xs text-atlas-sub cursor-pointer">
+              <input type="checkbox" checked={airlineFilter[al] !== false} onChange={() => toggleAirline(al)} className="!w-3.5 !h-3.5 !p-0 !rounded accent-atlas-accent" />
               {al}
             </label>
           ))}
@@ -242,7 +215,6 @@ export default function FlightSearch() {
         </div>
       )}
 
-      {/* Results */}
       {filteredResults.length > 0 && (
         <div className="space-y-3">
           {filteredResults.map((flight) => {
@@ -257,17 +229,17 @@ export default function FlightSearch() {
               <div key={flight.id} className="card flex items-center justify-between gap-4">
                 <div className="flex items-center gap-5 flex-1">
                   <div className="text-center min-w-[80px]">
-                    <div className="font-heading font-semibold text-sm text-atlas-accent uppercase tracking-wide">{flight.airline}</div>
+                    <div className="text-sm font-bold text-atlas-text">{flight.airline}</div>
                     {flight.flightNumber && <div className="text-xs text-atlas-muted">{flight.flightNumber}</div>}
-                    <div className="text-xs text-atlas-sub mt-0.5">
+                    <span className={`inline-block mt-1 text-xs font-semibold px-2.5 py-0.5 rounded-pill ${flight.stops === 0 ? 'bg-atlas-green-light text-atlas-green-dark' : 'bg-atlas-bg text-atlas-sub'}`}>
                       {flight.stops === 0 ? 'Nonstop' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}
-                    </div>
+                    </span>
                   </div>
                   <div className="flex-1">
-                    <div className="text-sm text-atlas-text font-medium">
+                    <div className="text-sm font-medium text-atlas-text">
                       {flight.departure || '—'} → {flight.arrival || '—'}
                     </div>
-                    <div className="text-xs text-atlas-muted">
+                    <div className="text-xs text-atlas-muted mt-0.5">
                       {flight.departureAirport} → {flight.arrivalAirport}
                       {flight.duration && <span className="ml-2">· {flight.duration}</span>}
                     </div>
@@ -276,10 +248,10 @@ export default function FlightSearch() {
                 <div className="text-right shrink-0">
                   {mode === 'points' && pointsNeeded ? (
                     <>
-                      <div className="font-display text-2xl text-atlas-success">{formatPoints(pointsNeeded)} pts</div>
+                      <div className="text-xl font-extrabold text-atlas-success">{formatPoints(pointsNeeded)} pts</div>
                       <div className="text-xs text-atlas-muted">{formatCurrency(flight.price)} cash</div>
                       {isGoodDeal !== null && (
-                        <span className={`text-xs font-semibold ${isGoodDeal ? 'text-atlas-success' : 'text-atlas-danger'}`}>
+                        <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-pill mt-1 inline-block ${isGoodDeal ? 'bg-atlas-green-light text-atlas-green-dark' : 'bg-red-50 text-atlas-danger'}`}>
                           {isGoodDeal ? 'Good deal' : 'Poor deal'}
                         </span>
                       )}
@@ -287,13 +259,13 @@ export default function FlightSearch() {
                   ) : (
                     <>
                       {flight.price ? (
-                        <div className="font-display text-3xl text-atlas-gold">{formatCurrency(flight.price)}</div>
+                        <div className="text-2xl font-extrabold text-atlas-text">{formatCurrency(flight.price)}</div>
                       ) : (
                         <div className="text-sm text-atlas-muted">Price N/A</div>
                       )}
                       <button
                         onClick={() => setSaved(flight.id)}
-                        className={`text-xs mt-1 ${saved === flight.id ? 'text-atlas-success font-semibold' : 'text-atlas-blue hover:underline'}`}
+                        className={`text-xs font-semibold mt-1 px-3 py-1 rounded-pill transition-colors ${saved === flight.id ? 'bg-atlas-green-light text-atlas-green-dark' : 'bg-atlas-accent text-white hover:bg-atlas-accent-hover'}`}
                       >
                         {saved === flight.id ? 'Saved!' : 'Save to trip'}
                       </button>
@@ -307,9 +279,9 @@ export default function FlightSearch() {
       )}
 
       {!loading && results.length === 0 && !error && (
-        <div className="text-center py-16 text-atlas-muted">
-          <div className="text-4xl mb-3 opacity-30">&#9992;</div>
-          <p>Enter a route and date to search for flights.</p>
+        <div className="text-center py-20 text-atlas-muted">
+          <div className="text-5xl mb-4 opacity-20">&#9992;</div>
+          <p className="font-medium">Enter a route and date to search.</p>
           <p className="text-xs mt-1 opacity-60">Powered by SerpApi Google Flights</p>
         </div>
       )}

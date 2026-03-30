@@ -3,12 +3,19 @@ import { Link } from 'react-router-dom';
 import { useTripStore } from '../store/tripStore';
 import { usePointsStore } from '../store/pointsStore';
 import StatCard from '../components/StatCard';
-import { formatCurrency, formatPoints, formatDateShort, daysUntil, STATUS_BG, STATUS_COLORS, getMonthsOfYear } from '../utils/format';
+import { formatCurrency, formatPoints, formatDateShort, daysUntil, STATUS_COLORS, getMonthsOfYear } from '../utils/format';
 import { format, parseISO } from 'date-fns';
 
 const YEAR = new Date().getFullYear();
 const MONTHS = getMonthsOfYear(YEAR);
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
+}
 
 export default function Dashboard() {
   const { trips, fetchTrips } = useTripStore();
@@ -43,12 +50,14 @@ export default function Dashboard() {
   }, [trips]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-5xl tracking-wider text-atlas-text">DASHBOARD</h1>
-        <span className="font-heading font-semibold text-sm uppercase tracking-wider text-atlas-muted">{YEAR} Travel Journal</span>
+    <div className="space-y-8">
+      {/* Greeting */}
+      <div>
+        <h1 className="text-3xl font-bold text-atlas-text">{getGreeting()}, Ben</h1>
+        <p className="text-atlas-muted text-sm mt-1">{YEAR} Travel Journal</p>
       </div>
 
+      {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard label="Total Trips" value={trips.length} sub={`${upcomingTrips.length} upcoming`} />
         <StatCard label="Total Points" value={formatPoints(totalPoints)} accent />
@@ -60,8 +69,9 @@ export default function Dashboard() {
         />
       </div>
 
+      {/* Annual Calendar */}
       <div className="card">
-        <h2 className="font-display text-2xl tracking-wider text-atlas-text mb-4">ANNUAL CALENDAR</h2>
+        <h2 className="text-lg font-bold text-atlas-text mb-5">Annual Calendar</h2>
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
           {MONTHS.map((m, i) => {
             const monthTrips = tripsByMonth[m] || [];
@@ -69,22 +79,19 @@ export default function Dashboard() {
             return (
               <div
                 key={m}
-                className={`rounded-lg border p-3 ${
-                  isCurrentMonth ? 'border-atlas-accent bg-atlas-accent/5' : 'border-atlas-border bg-atlas-bg/50'
+                className={`rounded-2xl p-3 transition-colors ${
+                  isCurrentMonth ? 'bg-atlas-green-light ring-1 ring-atlas-green/20' : 'bg-atlas-bg'
                 }`}
               >
-                <div className="font-heading font-semibold text-xs uppercase tracking-wider text-atlas-muted mb-2">{MONTH_LABELS[i]}</div>
+                <div className="text-xs font-medium text-atlas-muted mb-2">{MONTH_LABELS[i]}</div>
                 {monthTrips.length === 0 ? (
-                  <div className="text-xs text-atlas-border">No trips</div>
+                  <div className="text-xs text-atlas-muted/50">No trips</div>
                 ) : (
                   <div className="space-y-1.5">
                     {monthTrips.map((t) => (
-                      <div
-                        key={t.id}
-                        className={`text-xs px-2 py-1 rounded border ${STATUS_BG[t.status]}`}
-                      >
-                        <div className="font-medium truncate">{t.destination.split(',')[0]}</div>
-                        <div className="opacity-70">
+                      <div key={t.id} className="text-xs bg-white rounded-xl px-2.5 py-1.5 shadow-sm">
+                        <div className="font-semibold truncate text-atlas-text">{t.destination.split(',')[0]}</div>
+                        <div className="text-atlas-muted">
                           {formatDateShort(t.start_date)}–{formatDateShort(t.end_date)}
                         </div>
                       </div>
@@ -97,26 +104,27 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Upcoming Trips */}
       <div className="card">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-display text-2xl tracking-wider text-atlas-text">UPCOMING TRIPS</h2>
-          <Link to="/destinations" className="font-heading font-semibold text-xs uppercase tracking-wider text-atlas-accent hover:underline">View all</Link>
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-bold text-atlas-text">Upcoming Trips</h2>
+          <Link to="/destinations" className="text-sm font-semibold text-atlas-muted hover:text-atlas-text transition-colors">View all →</Link>
         </div>
         {upcomingTrips.length === 0 ? (
           <p className="text-atlas-muted text-sm">No upcoming trips planned.</p>
         ) : (
           <div className="space-y-3">
             {upcomingTrips.slice(0, 5).map((t) => (
-              <div key={t.id} className="flex items-center justify-between p-3 rounded-lg bg-atlas-bg/60 border border-atlas-border">
+              <div key={t.id} className="flex items-center justify-between p-4 rounded-2xl bg-atlas-bg">
                 <div>
-                  <div className="font-heading font-semibold text-atlas-text">{t.destination}</div>
-                  <div className="text-xs text-atlas-muted">
+                  <div className="font-semibold text-atlas-text">{t.destination}</div>
+                  <div className="text-sm text-atlas-muted mt-0.5">
                     {formatDateShort(t.start_date)} – {formatDateShort(t.end_date)} · {t.airline || 'No airline'}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`font-heading font-semibold text-xs uppercase tracking-wider ${STATUS_COLORS[t.status]}`}>{t.status}</span>
-                  <span className="font-display text-2xl text-atlas-gold">{daysUntil(t.start_date)}d</span>
+                  <span className={`text-xs font-semibold px-3 py-1 rounded-pill ${STATUS_COLORS[t.status]}`}>{t.status}</span>
+                  <span className="text-2xl font-extrabold text-atlas-text">{daysUntil(t.start_date)}d</span>
                 </div>
               </div>
             ))}

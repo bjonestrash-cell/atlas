@@ -52,7 +52,7 @@ export default function Destinations() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-5xl tracking-wider text-atlas-text">DESTINATIONS</h1>
+        <h1 className="text-3xl font-bold text-atlas-text">Destinations</h1>
         <button onClick={openNew} className="btn-primary">+ Add Trip</button>
       </div>
 
