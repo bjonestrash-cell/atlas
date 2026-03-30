@@ -1,0 +1,13 @@
+{
+  "name": "atlas-server",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.1",
+    "node-cron": "^3.0.3",
+    "node-fetch": "^2.7.0",
+    "sql.js": "^1.11.0"
+  }
+}
