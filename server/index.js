@@ -19,6 +19,7 @@ app.use('/api/flights', require('./routes/flights'));
 app.use('/api/alerts', require('./routes/alerts'));
 app.use('/api/budget', require('./routes/budget'));
 app.use('/api/status', require('./routes/status'));
+app.use('/api/promotions', require('./routes/promotions'));
 
 // Health check
 app.get('/api/health', (req, res) => {

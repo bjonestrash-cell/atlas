@@ -43,6 +43,9 @@ export const api = {
   saveStatus: (data) => request('/status', { method: 'POST', body: JSON.stringify(data) }),
   deleteStatus: (id) => request(`/status/${id}`, { method: 'DELETE' }),
 
+  // Promotions
+  getPromotions: () => request('/promotions'),
+
   // Budget
   getBudget: (params) => request(`/budget${params ? '?' + new URLSearchParams(params) : ''}`),
   getBudgetSummary: (year) => request(`/budget/summary${year ? '?year=' + year : ''}`),

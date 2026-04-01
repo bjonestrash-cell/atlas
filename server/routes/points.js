@@ -38,9 +38,9 @@ router.post('/', (req, res) => {
       [balance || 0, cpp || 1.0, expiration_date || null, fav, program_name]);
     return res.json(get('SELECT * FROM points_balances WHERE program_name = ?', [program_name]));
   }
-  const result = run(`INSERT INTO points_balances (program_name, balance, cpp, expiration_date, favorite) VALUES (?, ?, ?, ?, ?)`,
+  run(`INSERT INTO points_balances (program_name, balance, cpp, expiration_date, favorite) VALUES (?, ?, ?, ?, ?)`,
     [program_name, balance || 0, cpp || 1.0, expiration_date || null, fav]);
-  res.status(201).json(get('SELECT * FROM points_balances WHERE id = ?', [result.lastInsertRowid]));
+  res.status(201).json(get('SELECT * FROM points_balances WHERE program_name = ?', [program_name]));
 });
 
 router.put('/:id', (req, res) => {
