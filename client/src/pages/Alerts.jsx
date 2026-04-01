@@ -4,13 +4,13 @@ import { usePointsStore } from '../store/pointsStore';
 import Modal from '../components/Modal';
 import { formatCurrency, formatDate, daysUntil, formatPoints } from '../utils/format';
 import { api } from '../utils/api';
-import { ExternalLink, RefreshCw } from 'lucide-react';
+import { ExternalLink, RefreshCw, CreditCard, Plane, Building2, Car } from 'lucide-react';
 
 const CAT_CONFIG = {
-  credit_card: { label: 'Credit Cards', color: '#1a1a1a', icon: '💳' },
-  airline: { label: 'Airlines', color: '#8bc34a', icon: '✈️' },
-  hotel: { label: 'Hotels', color: '#999999', icon: '🏨' },
-  rental_car: { label: 'Rental Cars', color: '#e6a817', icon: '🚗' },
+  credit_card: { label: 'Credit Cards', color: '#1a1a1a', Icon: CreditCard },
+  airline: { label: 'Airlines', color: '#8bc34a', Icon: Plane },
+  hotel: { label: 'Hotels', color: '#999999', Icon: Building2 },
+  rental_car: { label: 'Rental Cars', color: '#e6a817', Icon: Car },
 };
 const CAT_ORDER = ['credit_card', 'airline', 'hotel', 'rental_car'];
 
@@ -181,7 +181,9 @@ export default function Alerts() {
 
         return (
           <div key={cat} className="card border-l-4" style={{ borderLeftColor: config.color }}>
-            <h3 className="stat-label mb-4" style={{ color: config.color }}>{config.icon} {config.label}</h3>
+            <h3 className="stat-label mb-4 flex items-center gap-1.5" style={{ color: config.color }}>
+              <config.Icon size={14} /> {config.label}
+            </h3>
             <div className="space-y-5">
               {catPromos.map((group) => (
                 <div key={group.program}>
