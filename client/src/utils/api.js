@@ -44,7 +44,7 @@ export const api = {
   deleteStatus: (id) => request(`/status/${id}`, { method: 'DELETE' }),
 
   // Promotions
-  getPromotions: () => request('/promotions'),
+  getPromotions: (tab) => request(`/promotions${tab ? '?tab=' + tab : ''}`),
 
   // Budget
   getBudget: (params) => request(`/budget${params ? '?' + new URLSearchParams(params) : ''}`),

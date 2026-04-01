@@ -76,6 +76,85 @@ function BottomSheet({ open, onClose, children }) {
   );
 }
 
+function PortfolioBar({ totals, barAnimated }) {
+  const [hovered, setHovered] = useState(null);
+  const barRef = useRef(null);
+  const [tooltipX, setTooltipX] = useState(0);
+
+  const handleEnter = (cat, e) => {
+    setHovered(cat);
+    updateTooltipPos(e);
+  };
+
+  const handleMove = (e) => {
+    updateTooltipPos(e);
+  };
+
+  const updateTooltipPos = (e) => {
+    if (!barRef.current) return;
+    const rect = barRef.current.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const x = clientX - rect.left;
+    setTooltipX(Math.max(70, Math.min(x, rect.width - 70)));
+  };
+
+  const handleLeave = () => setHovered(null);
+
+  const handleTouch = (cat, e) => {
+    if (hovered === cat) { setHovered(null); return; }
+    handleEnter(cat, e);
+  };
+
+  return (
+    <div className="relative mt-5 mb-4" ref={barRef}>
+      {/* Tooltip */}
+      {hovered && (
+        <div
+          className="absolute bottom-full mb-2.5 -translate-x-1/2 pointer-events-none z-10"
+          style={{ left: tooltipX, animation: 'fadeIn 150ms ease-out' }}
+        >
+          <div className="bg-white rounded-xl px-3.5 py-2.5 shadow-lg border border-atlas-border text-left whitespace-nowrap">
+            <div className="text-xs font-bold text-atlas-text mb-0.5">{CAT_CONFIG[hovered].label}</div>
+            <div className="text-sm font-extrabold text-atlas-text">{formatCurrency(totals[hovered])}</div>
+            <div className="text-[10px] text-atlas-muted mt-0.5">
+              {formatPoints(totals[hovered + '_pts'])} pts · {totals.total > 0 ? ((totals[hovered] / totals.total) * 100).toFixed(1) : 0}%
+            </div>
+          </div>
+          <div className="w-2 h-2 bg-white border-b border-r border-atlas-border rotate-45 mx-auto -mt-1.5" />
+        </div>
+      )}
+      {/* Bar */}
+      <div className="flex rounded-full overflow-hidden h-4 bg-atlas-bg">
+        {CAT_ORDER.map((cat) => {
+          const pct = totals.total > 0 ? (totals[cat] / totals.total) * 100 : 0;
+          if (pct < 0.5) return null;
+          const isHovered = hovered === cat;
+          return (
+            <div
+              key={cat}
+              className="h-full transition-all duration-300 ease-out cursor-pointer"
+              style={{
+                width: barAnimated ? `${pct}%` : '0%',
+                backgroundColor: CAT_CONFIG[cat].color,
+                filter: isHovered ? 'brightness(1.25)' : hovered ? 'brightness(0.85)' : 'none',
+                transform: isHovered ? 'scaleY(1.3)' : 'scaleY(1)',
+                borderRadius: isHovered ? '4px' : '0',
+                zIndex: isHovered ? 2 : 1,
+                position: 'relative',
+              }}
+              onMouseEnter={(e) => handleEnter(cat, e)}
+              onMouseMove={handleMove}
+              onMouseLeave={handleLeave}
+              onTouchStart={(e) => handleTouch(cat, e)}
+            />
+          );
+        })}
+      </div>
+      <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(4px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }`}</style>
+    </div>
+  );
+}
+
 export default function PointsManager() {
   const navigate = useNavigate();
   const [programs, setPrograms] = useState({});
@@ -124,12 +203,13 @@ export default function PointsManager() {
 
   const totals = useMemo(() => {
     const r = { total: 0, totalPoints: 0 };
-    CAT_ORDER.forEach((c) => { r[c] = 0; });
+    CAT_ORDER.forEach((c) => { r[c] = 0; r[c + '_pts'] = 0; });
     activePrograms.forEach((p) => {
       const val = (p.balance * p.cpp) / 100;
       r.total += val;
       r.totalPoints += p.balance;
       r[p.category] = (r[p.category] || 0) + val;
+      r[p.category + '_pts'] = (r[p.category + '_pts'] || 0) + p.balance;
     });
     return r;
   }, [activePrograms]);
@@ -236,13 +316,7 @@ export default function PointsManager() {
 
         {totalCount > 0 && (
           <>
-            <div className="flex rounded-full overflow-hidden h-3 mt-5 mb-4 bg-atlas-bg">
-              {CAT_ORDER.map((cat) => {
-                const pct = totals.total > 0 ? (totals[cat] / totals.total) * 100 : 0;
-                if (pct < 0.5) return null;
-                return <div key={cat} className="h-full transition-all duration-1000 ease-out" style={{ width: barAnimated ? `${pct}%` : '0%', backgroundColor: CAT_CONFIG[cat].color }} />;
-              })}
-            </div>
+            <PortfolioBar totals={totals} barAnimated={barAnimated} />
             <div className="flex justify-center gap-5 flex-wrap">
               {CAT_ORDER.map((cat) => totals[cat] > 0 ? (
                 <div key={cat} className="flex items-center gap-1.5">

@@ -4,13 +4,21 @@ import { usePointsStore } from '../store/pointsStore';
 import Modal from '../components/Modal';
 import { formatCurrency, formatDate, daysUntil, formatPoints } from '../utils/format';
 import { api } from '../utils/api';
-import { ExternalLink, RefreshCw, CreditCard, Plane, Building2, Car } from 'lucide-react';
+import { ExternalLink, RefreshCw, CreditCard, Plane, Building2, Car, Star } from 'lucide-react';
+
+const TABS = [
+  { key: 'favorites', label: 'Favorites', Icon: Star },
+  { key: 'credit_card', label: 'Cards', Icon: CreditCard },
+  { key: 'airline', label: 'Airlines', Icon: Plane },
+  { key: 'hotel', label: 'Hotels', Icon: Building2 },
+  { key: 'rental_car', label: 'Cars', Icon: Car },
+];
 
 const CAT_CONFIG = {
-  credit_card: { label: 'Credit Cards', color: '#1a1a1a', Icon: CreditCard },
-  airline: { label: 'Airlines', color: '#8bc34a', Icon: Plane },
-  hotel: { label: 'Hotels', color: '#999999', Icon: Building2 },
-  rental_car: { label: 'Rental Cars', color: '#e6a817', Icon: Car },
+  credit_card: { label: 'Credit Cards', color: '#1a1a1a' },
+  airline: { label: 'Airlines', color: '#8bc34a' },
+  hotel: { label: 'Hotels', color: '#999999' },
+  rental_car: { label: 'Rental Cars', color: '#e6a817' },
 };
 const CAT_ORDER = ['credit_card', 'airline', 'hotel', 'rental_car'];
 
@@ -19,27 +27,36 @@ export default function Alerts() {
   const { programs, fetchPrograms } = usePointsStore();
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ origin: '', destination: '', target_price: '', date: '' });
-  const [promotions, setPromotions] = useState(null);
+
+  // Promotions state
+  const [promoData, setPromoData] = useState(null); // { news, favorites, activeCats }
   const [promoLoading, setPromoLoading] = useState(false);
-  const [promoError, setPromoError] = useState('');
+  const [activeTab, setActiveTab] = useState('favorites');
 
   useEffect(() => {
     fetchAlerts();
     fetchPrograms();
-    loadPromotions();
+    loadPromotions('favorites');
   }, []);
 
-  const loadPromotions = async () => {
+  const loadPromotions = async (tab) => {
     setPromoLoading(true);
-    setPromoError('');
     try {
-      const data = await api.getPromotions();
-      setPromotions(data);
+      const data = await api.getPromotions(tab);
+      setPromoData(data);
     } catch (e) {
-      setPromoError('Could not load promotions');
       console.error(e);
     }
     setPromoLoading(false);
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    loadPromotions(tab);
+  };
+
+  const handleRefresh = () => {
+    loadPromotions(activeTab);
   };
 
   const handleSave = async () => {
@@ -68,7 +85,20 @@ export default function Alerts() {
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
 
-  const hasPromotions = promotions && CAT_ORDER.some((cat) => promotions[cat]?.length > 0);
+  // Current tab news items
+  const currentNews = promoData?.news || {};
+  const activeCats = promoData?.activeCats || {};
+  const favoritesList = promoData?.favorites || [];
+
+  const tabHasNews = (tab) => {
+    if (tab === 'favorites') return CAT_ORDER.some((c) => (currentNews[c] || []).length > 0);
+    return (currentNews[tab] || []).length > 0;
+  };
+
+  const isTabDisabled = (tab) => {
+    if (tab === 'favorites') return false;
+    return (activeCats[tab] || 0) === 0;
+  };
 
   return (
     <div className="space-y-6">
@@ -147,75 +177,113 @@ export default function Alerts() {
         {alerts.length > 0 && <p className="text-[10px] text-atlas-muted mt-3">Checked daily at 8:00 AM via SerpApi</p>}
       </div>
 
-      {/* Promotions & News Section */}
+      {/* Promotions & News — Tabbed */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-atlas-text">Promotions & News</h2>
-        <button onClick={loadPromotions} disabled={promoLoading} className="btn-secondary !py-1.5 !px-3 text-xs flex items-center gap-1.5">
-          <RefreshCw size={12} className={promoLoading ? 'animate-spin' : ''} /> Refresh
+        <button
+          onClick={handleRefresh}
+          disabled={promoLoading}
+          className="btn-secondary !py-1.5 !px-3 text-xs flex items-center gap-1.5 group"
+        >
+          <RefreshCw
+            size={12}
+            className={`transition-transform duration-500 ${promoLoading ? 'animate-[spin_0.8s_linear_infinite]' : 'group-hover:rotate-[20deg]'}`}
+          />
+          Refresh
         </button>
       </div>
 
-      {promoLoading && !promotions && (
+      {/* Tabs */}
+      <div className="flex gap-1 overflow-x-auto pb-1 -mx-1 px-1">
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.key;
+          const disabled = isTabDisabled(tab.key);
+          const Icon = tab.Icon;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => !disabled && handleTabChange(tab.key)}
+              disabled={disabled}
+              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-semibold whitespace-nowrap transition-all ${
+                isActive
+                  ? 'bg-atlas-accent text-white shadow-sm'
+                  : disabled
+                    ? 'bg-atlas-bg text-atlas-border cursor-not-allowed'
+                    : 'bg-white text-atlas-sub hover:bg-atlas-bg border border-atlas-border'
+              }`}
+            >
+              <Icon size={13} strokeWidth={isActive ? 2.5 : 1.5} />
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Tab Content */}
+      {promoLoading && (
         <div className="card text-center py-8">
-          <RefreshCw size={24} className="animate-spin mx-auto text-atlas-muted mb-2" />
-          <p className="text-sm text-atlas-muted">Fetching latest promotions for your programs...</p>
+          <RefreshCw size={24} className="animate-[spin_0.8s_linear_infinite] mx-auto text-atlas-muted mb-2" />
+          <p className="text-sm text-atlas-muted">Loading news...</p>
         </div>
       )}
 
-      {promoError && !promotions && (
-        <div className="card text-center py-6">
-          <p className="text-sm text-atlas-muted">{promoError}</p>
+      {!promoLoading && activeTab === 'favorites' && favoritesList.length === 0 && (
+        <div className="card text-center py-10">
+          <Star size={36} className="mx-auto text-atlas-border mb-3" />
+          <p className="text-sm font-semibold text-atlas-text mb-1">No favorites yet</p>
+          <p className="text-xs text-atlas-muted">Star a program in your Points Portfolio or Loyalty Status to see personalized news here.</p>
         </div>
       )}
 
-      {promotions && !hasPromotions && (
-        <div className="card text-center py-8">
-          <p className="text-sm text-atlas-muted">Add points programs or loyalty statuses to see relevant promotions and news here.</p>
+      {!promoLoading && activeTab !== 'favorites' && isTabDisabled(activeTab) && (
+        <div className="card text-center py-10">
+          <p className="text-sm text-atlas-muted">Add a {CAT_CONFIG[activeTab]?.label?.toLowerCase()} program to see news here.</p>
         </div>
       )}
 
-      {promotions && CAT_ORDER.map((cat) => {
-        const catPromos = promotions[cat];
-        if (!catPromos || catPromos.length === 0) return null;
-        const config = CAT_CONFIG[cat];
+      {!promoLoading && promoData && (
+        <div className="space-y-4">
+          {CAT_ORDER.map((cat) => {
+            if (activeTab !== 'favorites' && activeTab !== cat) return null;
+            const catNews = currentNews[cat] || [];
+            if (catNews.length === 0) return null;
 
-        return (
-          <div key={cat} className="card border-l-4" style={{ borderLeftColor: config.color }}>
-            <h3 className="stat-label mb-4 flex items-center gap-1.5" style={{ color: config.color }}>
-              <config.Icon size={14} /> {config.label}
-            </h3>
-            <div className="space-y-5">
-              {catPromos.map((group) => (
-                <div key={group.program}>
-                  <div className="text-sm font-bold text-atlas-text mb-2">{group.program}</div>
-                  <div className="space-y-2">
-                    {group.items.map((item, idx) => (
-                      <a
-                        key={idx}
-                        href={item.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block p-3 rounded-2xl bg-atlas-bg hover:bg-atlas-border/50 transition-colors group"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-semibold text-atlas-text group-hover:text-atlas-accent truncate">{item.title}</div>
-                            {item.snippet && <div className="text-xs text-atlas-muted mt-0.5 line-clamp-2">{item.snippet}</div>}
-                            <div className="text-[10px] text-atlas-muted mt-1">
-                              {item.source}{item.date ? ` · ${item.date}` : ''}
-                            </div>
-                          </div>
-                          <ExternalLink size={14} className="text-atlas-muted shrink-0 mt-0.5 group-hover:text-atlas-accent" />
-                        </div>
-                      </a>
-                    ))}
+            return catNews.map((group) => (
+              <div key={group.program} className="card">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-1 h-6 rounded-full" style={{ backgroundColor: CAT_CONFIG[cat]?.color || '#999' }} />
+                  <div>
+                    <div className="text-sm font-bold text-atlas-text">{group.program}</div>
+                    <div className="text-[10px] text-atlas-muted uppercase tracking-wider">{CAT_CONFIG[cat]?.label}</div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        );
-      })}
+                <div className="space-y-2">
+                  {group.items.map((item, idx) => (
+                    <a
+                      key={idx}
+                      href={item.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block p-3 rounded-2xl bg-atlas-bg hover:bg-atlas-border/50 transition-colors group"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-semibold text-atlas-text group-hover:text-atlas-accent truncate">{item.title}</div>
+                          {item.snippet && <div className="text-xs text-atlas-muted mt-0.5 line-clamp-2">{item.snippet}</div>}
+                          <div className="text-[10px] text-atlas-muted mt-1">
+                            {item.source}{item.date ? ` · ${item.date}` : ''}
+                          </div>
+                        </div>
+                        <ExternalLink size={14} className="text-atlas-muted shrink-0 mt-0.5 group-hover:text-atlas-accent" />
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ));
+          })}
+        </div>
+      )}
 
       {/* Add Alert Modal */}
       <Modal open={showModal} onClose={() => setShowModal(false)} title="New Price Alert">

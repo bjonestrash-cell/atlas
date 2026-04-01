@@ -98,25 +98,48 @@ async function searchNews(query) {
 }
 
 // GET /api/promotions — fetches news for all active user programs
+// Optional ?tab=favorites|credit_card|airline|hotel|rental_car to filter
 router.get('/', async (req, res) => {
-  const activePrograms = all('SELECT program_name, balance FROM points_balances WHERE balance > 0');
-  // Also include programs from loyalty_status
+  const tab = req.query.tab || 'all';
+
+  const activePrograms = all('SELECT program_name, balance, favorite FROM points_balances WHERE balance > 0');
   const statusPrograms = all("SELECT program_name, category FROM loyalty_status WHERE status_level != '' AND status_level IS NOT NULL");
+
+  const favoriteNames = new Set(activePrograms.filter((p) => p.favorite).map((p) => p.program_name));
 
   const allProgramNames = new Set();
   activePrograms.forEach((p) => allProgramNames.add(p.program_name));
   statusPrograms.forEach((p) => allProgramNames.add(p.program_name));
 
-  if (allProgramNames.size === 0) {
-    return res.json({ credit_card: [], airline: [], hotel: [], rental_car: [] });
+  // Build list of active program names per category
+  const programsByCat = { credit_card: [], airline: [], hotel: [], rental_car: [] };
+  allProgramNames.forEach((name) => {
+    const cat = CATEGORY_MAP[name] || 'credit_card';
+    programsByCat[cat].push(name);
+  });
+
+  // Determine which programs to fetch based on tab
+  let namesToFetch = [];
+  if (tab === 'favorites') {
+    namesToFetch = [...favoriteNames];
+  } else if (tab !== 'all' && programsByCat[tab]) {
+    namesToFetch = programsByCat[tab];
+  } else {
+    namesToFetch = [...allProgramNames];
+  }
+
+  if (namesToFetch.length === 0) {
+    return res.json({
+      news: { credit_card: [], airline: [], hotel: [], rental_car: [] },
+      favorites: [...favoriteNames],
+      activeCats: Object.fromEntries(Object.entries(programsByCat).map(([k, v]) => [k, v.length])),
+    });
   }
 
   const results = { credit_card: [], airline: [], hotel: [], rental_car: [] };
+  const limited = namesToFetch.slice(0, 8);
 
-  // Limit to 6 programs max to avoid hitting API rate limits
-  const names = [...allProgramNames].slice(0, 6);
-
-  await Promise.all(names.map(async (name) => {
+  await Promise.all(limited.map(async (name) => {
     const brand = BRAND_MAP[name] || name;
     const cat = CATEGORY_MAP[name] || 'credit_card';
     const news = await searchNews(brand);
@@ -125,7 +148,11 @@ router.get('/', async (req, res) => {
     }
   }));
 
-  res.json(results);
+  res.json({
+    news: results,
+    favorites: [...favoriteNames],
+    activeCats: Object.fromEntries(Object.entries(programsByCat).map(([k, v]) => [k, v.length])),
+  });
 });
 
 module.exports = router;
