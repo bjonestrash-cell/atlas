@@ -1,13 +1,10 @@
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { SortableContext, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { Star } from 'lucide-react';
+import { Star, Plus, Search, X, Trash2, ChevronRight } from 'lucide-react';
 import { api } from '../utils/api';
 import { formatCurrency, formatPoints, daysUntil } from '../utils/format';
 
-const DEFAULT_PROGRAMS = [
+const ALL_PROGRAMS = [
   { name: 'Chase Sapphire Reserve (UR)', category: 'credit_card', cpp: 2.0 },
   { name: 'Chase Sapphire Preferred (UR)', category: 'credit_card', cpp: 2.0 },
   { name: 'Chase Freedom Unlimited (UR)', category: 'credit_card', cpp: 2.0 },
@@ -36,7 +33,6 @@ const DEFAULT_PROGRAMS = [
   { name: 'IHG One Rewards', category: 'hotel', cpp: 0.5 },
   { name: 'Wyndham Rewards', category: 'hotel', cpp: 1.1 },
   { name: 'Choice Privileges', category: 'hotel', cpp: 0.6 },
-  // Rental Cars
   { name: 'Avis Preferred Points', category: 'rental_car', cpp: 0.7 },
   { name: 'Enterprise Plus', category: 'rental_car', cpp: 0.6 },
   { name: 'Hertz Gold Plus', category: 'rental_car', cpp: 0.8 },
@@ -56,44 +52,25 @@ const CAT_ORDER = ['credit_card', 'airline', 'hotel', 'rental_car'];
 function fmtCommas(n) { return n ? new Intl.NumberFormat('en-US').format(n) : ''; }
 function parseBal(s) { return parseInt(String(s).replace(/,/g, '')) || 0; }
 
-function SortableCard({ prog, balance, display, isFavorite, onBalanceChange, onBalanceBlur, onBalanceFocus, onExpChange, onExpBlur, onFlyClick, onToggleFavorite, catColor }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: prog.name });
-  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
-  const cashValue = (balance.balance * prog.cpp) / 100;
-  const daysLeft = balance.expiration_date ? daysUntil(balance.expiration_date) : null;
-  const expiring = daysLeft !== null && daysLeft >= 0 && daysLeft <= 60;
+// Bottom sheet component
+function BottomSheet({ open, onClose, children }) {
+  useEffect(() => {
+    if (open) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
+    return () => { document.body.style.overflow = ''; };
+  }, [open]);
 
   return (
-    <div ref={setNodeRef} style={style} className="bg-white rounded-card p-5 flex flex-col gap-3 shadow-sm border-l-4" data-color={catColor}>
-      <style>{`[data-color="${catColor}"] { border-left-color: ${catColor}; }`}</style>
-      <div className="flex items-start justify-between">
-        <div className="flex-1 min-w-0">
-          <div className="font-bold text-atlas-text text-sm">{prog.name}</div>
-          <div className="text-xs text-atlas-muted mt-0.5">{prog.cpp}¢ per point</div>
+    <div className={`fixed inset-0 z-50 transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div
+        className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[92vh] flex flex-col transition-transform duration-300 ease-out ${open ? 'translate-y-0' : 'translate-y-full'}`}
+        style={{ boxShadow: '0 -8px 40px rgba(0,0,0,0.15)' }}
+      >
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-atlas-border" />
         </div>
-        <div className="flex items-center gap-1 shrink-0">
-          <button onClick={() => onToggleFavorite(prog.name)} className="p-1 rounded-lg hover:bg-atlas-bg transition-colors" title="Toggle favorite">
-            <Star size={14} fill={isFavorite ? '#e6a817' : 'none'} stroke={isFavorite ? '#e6a817' : '#999'} strokeWidth={2} />
-          </button>
-          {expiring && (
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-pill ${daysLeft <= 30 ? 'bg-red-50 text-atlas-danger' : 'bg-yellow-50 text-yellow-700'}`}>{daysLeft}d</span>
-          )}
-          <button {...attributes} {...listeners} className="cursor-grab text-atlas-muted hover:text-atlas-text p-1 rounded-lg hover:bg-atlas-bg" title="Drag to reorder">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeWidth={2} d="M4 8h16M4 16h16" /></svg>
-          </button>
-        </div>
-      </div>
-      <div className="flex items-center gap-3">
-        <input type="text" inputMode="numeric" value={display} onChange={(e) => onBalanceChange(prog.name, e.target.value)} onBlur={() => onBalanceBlur(prog.name)} onFocus={(e) => { onBalanceFocus(prog.name); e.target.select(); }} placeholder="0" className="flex-1 text-xl font-extrabold !py-2" style={{ minWidth: 0 }} />
-        {balance.balance > 0 && <div className="text-sm font-semibold text-atlas-success whitespace-nowrap">≈ {formatCurrency(cashValue)}</div>}
-      </div>
-      <div className="flex items-center gap-2">
-        <input type="date" value={balance.expiration_date} onChange={(e) => onExpChange(prog.name, e.target.value)} onBlur={() => onExpBlur(prog.name)} className="flex-1 text-xs !py-2 text-atlas-muted" />
-        {balance.balance > 0 && prog.category !== 'rental_car' && (
-          <button onClick={() => onFlyClick(prog.name)} className="text-xs font-semibold text-atlas-accent bg-atlas-bg px-3 py-1.5 rounded-pill hover:bg-atlas-border transition-colors whitespace-nowrap">
-            Fly &#9992;
-          </button>
-        )}
+        {children}
       </div>
     </div>
   );
@@ -101,204 +78,367 @@ function SortableCard({ prog, balance, display, isFavorite, onBalanceChange, onB
 
 export default function PointsManager() {
   const navigate = useNavigate();
-  const [balances, setBalances] = useState(() => {
-    const m = {};
-    DEFAULT_PROGRAMS.forEach((p) => { m[p.name] = { balance: 0, expiration_date: '' }; });
-    return m;
-  });
-  const [displayValues, setDisplayValues] = useState(() => {
-    const m = {};
-    DEFAULT_PROGRAMS.forEach((p) => { m[p.name] = ''; });
-    return m;
-  });
-  const [favorites, setFavorites] = useState(() => {
-    const m = {};
-    DEFAULT_PROGRAMS.forEach((p) => { m[p.name] = false; });
-    return m;
-  });
-  const [order, setOrder] = useState(() => {
-    const m = {};
-    CAT_ORDER.forEach((cat) => { m[cat] = DEFAULT_PROGRAMS.filter((p) => p.category === cat).map((p) => p.name); });
-    return m;
-  });
+  const [programs, setPrograms] = useState({});
   const [lastUpdated, setLastUpdated] = useState(null);
   const [barAnimated, setBarAnimated] = useState(false);
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  // Sheet states
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetMode, setSheetMode] = useState('pick'); // 'pick' | 'edit'
+  const [searchQuery, setSearchQuery] = useState('');
+  const [editName, setEditName] = useState('');
+  const [editBalance, setEditBalance] = useState('');
+  const [editExpiration, setEditExpiration] = useState('');
+  const balanceRef = useRef(null);
 
+  // Load from DB
   useEffect(() => {
     api.getPoints().then((saved) => {
-      const nb = { ...balances };
-      const nd = { ...displayValues };
-      const nf = { ...favorites };
-      for (const s of saved) {
-        if (nb[s.program_name] !== undefined) {
-          nb[s.program_name] = { balance: s.balance || 0, expiration_date: s.expiration_date || '' };
-          nd[s.program_name] = s.balance > 0 ? fmtCommas(s.balance) : '';
-          nf[s.program_name] = !!s.favorite;
+      const m = {};
+      saved.forEach((s) => {
+        if (s.balance > 0 || s.favorite) {
+          m[s.program_name] = { balance: s.balance || 0, expiration_date: s.expiration_date || '', favorite: !!s.favorite, cpp: s.cpp };
         }
+      });
+      setPrograms(m);
+      if (saved.length > 0) {
+        const latest = saved.filter((s) => s.updated_at).sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
+        if (latest) setLastUpdated(latest.updated_at);
       }
-      setBalances(nb);
-      setDisplayValues(nd);
-      setFavorites(nf);
-      if (saved.length > 0) setLastUpdated(saved.reduce((a, b) => a.updated_at > b.updated_at ? a : b).updated_at);
     });
     setTimeout(() => setBarAnimated(true), 100);
   }, []);
 
-  const saveProgram = useCallback(async (name, extraFields = {}) => {
-    const b = balances[name];
-    const p = DEFAULT_PROGRAMS.find((pr) => pr.name === name);
-    if (!p) return;
-    try {
-      await api.createPoint({ program_name: name, balance: b.balance, cpp: p.cpp, expiration_date: b.expiration_date || null, favorite: favorites[name] ? 1 : 0, ...extraFields });
-      setLastUpdated(new Date().toISOString());
-    } catch (e) { console.error('Save failed:', e); }
-  }, [balances, favorites]);
+  // Derived data
+  const activePrograms = useMemo(() => {
+    return Object.entries(programs)
+      .filter(([, v]) => v.balance > 0)
+      .map(([name, data]) => {
+        const def = ALL_PROGRAMS.find((p) => p.name === name);
+        return { name, ...data, cpp: def?.cpp || data.cpp || 1.0, category: def?.category || 'credit_card' };
+      });
+  }, [programs]);
 
-  const handleBalanceChange = (name, val) => {
-    setDisplayValues((d) => ({ ...d, [name]: val }));
-    setBalances((b) => ({ ...b, [name]: { ...b[name], balance: parseBal(val) } }));
-  };
-  const handleBalanceBlur = (name) => {
-    const num = balances[name].balance;
-    setDisplayValues((d) => ({ ...d, [name]: num > 0 ? fmtCommas(num) : '' }));
-    saveProgram(name);
-  };
-  const handleBalanceFocus = (name) => {
-    const num = balances[name].balance;
-    if (num > 0) setDisplayValues((d) => ({ ...d, [name]: String(num) }));
-  };
-  const handleExpChange = (name, date) => setBalances((b) => ({ ...b, [name]: { ...b[name], expiration_date: date } }));
-  const handleExpBlur = (name) => saveProgram(name);
-  const handleFlyClick = (name) => navigate(`/flights?program=${encodeURIComponent(name)}`);
-
-  const handleToggleFavorite = (name) => {
-    const newVal = !favorites[name];
-    setFavorites((f) => ({ ...f, [name]: newVal }));
-    // Save with new favorite status
-    const b = balances[name];
-    const p = DEFAULT_PROGRAMS.find((pr) => pr.name === name);
-    if (p) {
-      api.createPoint({ program_name: name, balance: b.balance, cpp: p.cpp, expiration_date: b.expiration_date || null, favorite: newVal ? 1 : 0 });
-    }
-  };
-
-  const handleDragEnd = (cat, event) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    setOrder((prev) => {
-      const items = [...prev[cat]];
-      const oldIdx = items.indexOf(active.id);
-      const newIdx = items.indexOf(over.id);
-      items.splice(oldIdx, 1);
-      items.splice(newIdx, 0, active.id);
-      return { ...prev, [cat]: items };
-    });
-  };
+  const favoriteCards = activePrograms.filter((p) => p.favorite);
+  const totalCount = activePrograms.length;
 
   const totals = useMemo(() => {
     const r = { total: 0, totalPoints: 0 };
     CAT_ORDER.forEach((c) => { r[c] = 0; });
-    DEFAULT_PROGRAMS.forEach((p) => {
-      const bal = balances[p.name]?.balance || 0;
-      const val = (bal * p.cpp) / 100;
+    activePrograms.forEach((p) => {
+      const val = (p.balance * p.cpp) / 100;
       r.total += val;
-      r.totalPoints += bal;
-      r[p.category] += val;
+      r.totalPoints += p.balance;
+      r[p.category] = (r[p.category] || 0) + val;
     });
     return r;
-  }, [balances]);
+  }, [activePrograms]);
 
-  const favoritePrograms = DEFAULT_PROGRAMS.filter((p) => favorites[p.name]);
+  // Actions
+  const saveProgram = useCallback(async (name, balance, expiration, favorite) => {
+    const def = ALL_PROGRAMS.find((p) => p.name === name);
+    const cpp = def?.cpp || 1.0;
+    try {
+      await api.createPoint({ program_name: name, balance, cpp, expiration_date: expiration || null, favorite: favorite ? 1 : 0 });
+      setPrograms((prev) => ({ ...prev, [name]: { balance, expiration_date: expiration || '', favorite: !!favorite, cpp } }));
+      setLastUpdated(new Date().toISOString());
+    } catch (e) { console.error('Save failed:', e); }
+  }, []);
 
-  const renderCard = (name) => {
-    const prog = DEFAULT_PROGRAMS.find((p) => p.name === name);
-    if (!prog) return null;
-    return (
-      <SortableCard
-        key={name}
-        prog={prog}
-        balance={balances[name] || { balance: 0, expiration_date: '' }}
-        display={displayValues[name] || ''}
-        isFavorite={!!favorites[name]}
-        onBalanceChange={handleBalanceChange}
-        onBalanceBlur={handleBalanceBlur}
-        onBalanceFocus={handleBalanceFocus}
-        onExpChange={handleExpChange}
-        onExpBlur={handleExpBlur}
-        onFlyClick={handleFlyClick}
-        onToggleFavorite={handleToggleFavorite}
-        catColor={CAT_CONFIG[prog.category].color}
-      />
-    );
+  const deleteProgram = useCallback(async (name) => {
+    try {
+      await api.createPoint({ program_name: name, balance: 0, cpp: 1.0, expiration_date: null, favorite: 0 });
+      setPrograms((prev) => { const n = { ...prev }; delete n[name]; return n; });
+      setLastUpdated(new Date().toISOString());
+    } catch (e) { console.error('Delete failed:', e); }
+  }, []);
+
+  const toggleFavorite = useCallback((name) => {
+    const cur = programs[name];
+    if (!cur) return;
+    const newFav = !cur.favorite;
+    saveProgram(name, cur.balance, cur.expiration_date, newFav);
+  }, [programs, saveProgram]);
+
+  // Sheet controls
+  const openAddSheet = () => {
+    setSheetMode('pick');
+    setSearchQuery('');
+    setEditName('');
+    setEditBalance('');
+    setEditExpiration('');
+    setSheetOpen(true);
   };
 
+  const selectProgram = (name) => {
+    const def = ALL_PROGRAMS.find((p) => p.name === name);
+    const existing = programs[name];
+    setEditName(name);
+    setEditBalance(existing?.balance > 0 ? String(existing.balance) : '');
+    setEditExpiration(existing?.expiration_date || '');
+    setSheetMode('edit');
+    setTimeout(() => balanceRef.current?.focus(), 200);
+  };
+
+  const openEditSheet = (name) => {
+    const data = programs[name];
+    setEditName(name);
+    setEditBalance(data?.balance > 0 ? String(data.balance) : '');
+    setEditExpiration(data?.expiration_date || '');
+    setSheetMode('edit');
+    setSearchQuery('');
+    setSheetOpen(true);
+    setTimeout(() => balanceRef.current?.focus(), 300);
+  };
+
+  const handleSave = () => {
+    const bal = parseBal(editBalance);
+    if (!editName || bal <= 0) return;
+    const existing = programs[editName];
+    saveProgram(editName, bal, editExpiration, existing?.favorite || false);
+    setSheetOpen(false);
+  };
+
+  const handleDelete = () => {
+    if (!editName) return;
+    deleteProgram(editName);
+    setSheetOpen(false);
+  };
+
+  // Filtered search results
+  const filteredPrograms = useMemo(() => {
+    const q = searchQuery.toLowerCase();
+    return ALL_PROGRAMS.filter((p) => !q || p.name.toLowerCase().includes(q));
+  }, [searchQuery]);
+
+  const editProgramDef = ALL_PROGRAMS.find((p) => p.name === editName);
+  const editCashValue = editProgramDef ? (parseBal(editBalance) * editProgramDef.cpp) / 100 : 0;
+
   return (
-    <div className="space-y-8">
-      <div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-atlas-text">Points Portfolio</h1>
-        {lastUpdated && <p className="text-xs text-atlas-muted mt-1">Last updated {new Date(lastUpdated).toLocaleString()}</p>}
+        <button onClick={openAddSheet} className="btn-primary flex items-center gap-2">
+          <Plus size={18} /> Add Points
+        </button>
       </div>
 
-      {/* Portfolio Summary */}
-      <div className="card">
-        <div className="text-center mb-6">
-          <div className="stat-label mb-2">Total Portfolio Value</div>
-          <div className="text-5xl font-extrabold text-atlas-text tracking-tight">{formatCurrency(totals.total)}</div>
-          <div className="text-sm text-atlas-muted mt-2">{formatPoints(totals.totalPoints)} points across {DEFAULT_PROGRAMS.length} programs</div>
+      {/* Hero / Summary */}
+      <div className="card text-center">
+        <div className="stat-label mb-2">Total Portfolio Value</div>
+        <div className="text-5xl font-extrabold text-atlas-text tracking-tight">{formatCurrency(totals.total)}</div>
+        <div className="text-sm text-atlas-muted mt-2">
+          {totalCount > 0
+            ? `${formatPoints(totals.totalPoints)} points across ${totalCount} programs`
+            : 'Add your first loyalty program to get started'}
         </div>
-        <div className="flex rounded-full overflow-hidden h-3 mb-4 bg-atlas-bg">
-          {CAT_ORDER.map((cat) => {
-            const pct = totals.total > 0 ? (totals[cat] / totals.total) * 100 : 0;
-            if (pct < 0.5) return null;
-            return (
-              <div key={cat} className="h-full transition-all duration-1000 ease-out" style={{ width: barAnimated ? `${pct}%` : '0%', backgroundColor: CAT_CONFIG[cat].color }} title={`${CAT_CONFIG[cat].label}: ${formatCurrency(totals[cat])} (${pct.toFixed(0)}%)`} />
-            );
-          })}
-        </div>
-        <div className="flex justify-center gap-6 flex-wrap">
-          {CAT_ORDER.map((cat) => (
-            <div key={cat} className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CAT_CONFIG[cat].color }} />
-              <div>
-                <div className="text-xs text-atlas-muted">{CAT_CONFIG[cat].label}</div>
-                <div className="text-sm font-bold text-atlas-text">{formatCurrency(totals[cat])}</div>
-              </div>
+
+        {totalCount > 0 && (
+          <>
+            <div className="flex rounded-full overflow-hidden h-3 mt-5 mb-4 bg-atlas-bg">
+              {CAT_ORDER.map((cat) => {
+                const pct = totals.total > 0 ? (totals[cat] / totals.total) * 100 : 0;
+                if (pct < 0.5) return null;
+                return <div key={cat} className="h-full transition-all duration-1000 ease-out" style={{ width: barAnimated ? `${pct}%` : '0%', backgroundColor: CAT_CONFIG[cat].color }} />;
+              })}
             </div>
-          ))}
-        </div>
+            <div className="flex justify-center gap-5 flex-wrap">
+              {CAT_ORDER.map((cat) => totals[cat] > 0 ? (
+                <div key={cat} className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: CAT_CONFIG[cat].color }} />
+                  <span className="text-xs text-atlas-muted">{CAT_CONFIG[cat].label}</span>
+                  <span className="text-xs font-bold text-atlas-text">{formatCurrency(totals[cat])}</span>
+                </div>
+              ) : null)}
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Favorites — only shown if any exist */}
-      {favoritePrograms.length > 0 && (
+      {/* Empty state */}
+      {totalCount === 0 && (
+        <div className="text-center py-12">
+          <div className="text-5xl mb-4 opacity-15">&#128179;</div>
+          <p className="text-atlas-muted font-medium mb-4">No points programs added yet</p>
+          <button onClick={openAddSheet} className="btn-secondary inline-flex items-center gap-2">
+            <Plus size={16} /> Add Your First Program
+          </button>
+        </div>
+      )}
+
+      {/* Favorites pinned at top */}
+      {favoriteCards.length > 0 && (
         <div>
-          <h2 className="text-lg font-bold text-atlas-text mb-4 flex items-center gap-2">
-            <Star size={18} fill="#e6a817" stroke="#e6a817" /> Favorites
+          <h2 className="text-sm font-bold text-atlas-text mb-3 flex items-center gap-1.5 uppercase tracking-wider">
+            <Star size={14} fill="#e6a817" stroke="#e6a817" /> Favorites
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {favoritePrograms.map((prog) => renderCard(prog.name))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {favoriteCards.map((prog) => (
+              <PortfolioCard key={`fav-${prog.name}`} prog={prog} onTap={openEditSheet} onToggleFav={toggleFavorite} />
+            ))}
           </div>
         </div>
       )}
 
-      {/* Program Cards by Category with DnD */}
+      {/* Cards by category — only categories with active programs */}
       {CAT_ORDER.map((cat) => {
-        const catNames = order[cat];
-        const config = CAT_CONFIG[cat];
+        const catProgs = activePrograms.filter((p) => p.category === cat);
+        if (catProgs.length === 0) return null;
         return (
           <div key={cat}>
-            <h2 className="text-lg font-bold text-atlas-text mb-4">{config.label}</h2>
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => handleDragEnd(cat, e)}>
-              <SortableContext items={catNames} strategy={rectSortingStrategy}>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {catNames.map((name) => renderCard(name))}
-                </div>
-              </SortableContext>
-            </DndContext>
+            <h2 className="text-sm font-bold text-atlas-text mb-3 uppercase tracking-wider">{CAT_CONFIG[cat].label}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {catProgs.map((prog) => (
+                <PortfolioCard key={prog.name} prog={prog} onTap={openEditSheet} onToggleFav={toggleFavorite} />
+              ))}
+            </div>
           </div>
         );
       })}
+
+      {/* Bottom Sheet */}
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
+        {sheetMode === 'pick' ? (
+          <div className="flex flex-col overflow-hidden">
+            <div className="px-5 pb-3 pt-2">
+              <h2 className="text-lg font-bold text-atlas-text mb-3">Add Points Program</h2>
+              <div className="relative">
+                <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-atlas-muted" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search programs..."
+                  className="w-full !pl-10 !py-3.5 text-base"
+                  autoFocus
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-atlas-muted">
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="overflow-y-auto flex-1 px-5 pb-8" style={{ maxHeight: '60vh' }}>
+              {CAT_ORDER.map((cat) => {
+                const items = filteredPrograms.filter((p) => p.category === cat);
+                if (items.length === 0) return null;
+                return (
+                  <div key={cat} className="mb-4">
+                    <div className="text-xs font-bold uppercase tracking-wider text-atlas-muted mb-1.5 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: CAT_CONFIG[cat].color }} />
+                      {CAT_CONFIG[cat].label}
+                    </div>
+                    {items.map((prog) => {
+                      const hasBalance = programs[prog.name]?.balance > 0;
+                      return (
+                        <button
+                          key={prog.name}
+                          onClick={() => selectProgram(prog.name)}
+                          className="w-full flex items-center justify-between px-3 py-3.5 rounded-2xl hover:bg-atlas-bg transition-colors text-left"
+                        >
+                          <div>
+                            <div className="text-sm font-semibold text-atlas-text">{prog.name}</div>
+                            <div className="text-xs text-atlas-muted">{prog.cpp}¢ per point</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {hasBalance && <span className="text-xs font-semibold text-atlas-success">{fmtCommas(programs[prog.name].balance)} pts</span>}
+                            <ChevronRight size={16} className="text-atlas-border" />
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <div className="px-5 pb-8 pt-2">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h2 className="text-lg font-bold text-atlas-text">{editName}</h2>
+                {editProgramDef && <div className="text-xs text-atlas-muted">{editProgramDef.cpp}¢ per point · {CAT_CONFIG[editProgramDef.category]?.label}</div>}
+              </div>
+              <button onClick={() => setSheetMode('pick')} className="text-sm text-atlas-muted hover:text-atlas-text font-medium">Change</button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="stat-label block mb-2">Point Balance</label>
+                <input
+                  ref={balanceRef}
+                  type="text"
+                  inputMode="numeric"
+                  value={editBalance}
+                  onChange={(e) => setEditBalance(e.target.value.replace(/[^0-9]/g, ''))}
+                  placeholder="0"
+                  className="w-full text-3xl font-extrabold !py-4 text-center"
+                />
+                {parseBal(editBalance) > 0 && editProgramDef && (
+                  <div className="text-center mt-2 text-sm font-semibold text-atlas-success">
+                    ≈ {formatCurrency(editCashValue)}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="stat-label block mb-2">Expiration Date (optional)</label>
+                <input type="date" value={editExpiration} onChange={(e) => setEditExpiration(e.target.value)} className="w-full !py-3.5" />
+              </div>
+
+              <button onClick={handleSave} disabled={parseBal(editBalance) <= 0} className="btn-primary w-full !py-4 text-base mt-2">
+                Save
+              </button>
+
+              {programs[editName]?.balance > 0 && (
+                <button onClick={handleDelete} className="w-full flex items-center justify-center gap-2 py-3 text-atlas-danger text-sm font-semibold hover:bg-red-50 rounded-2xl transition-colors">
+                  <Trash2 size={16} /> Remove Program
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </BottomSheet>
     </div>
+  );
+}
+
+// Card component for active programs
+function PortfolioCard({ prog, onTap, onToggleFav }) {
+  const cashValue = (prog.balance * prog.cpp) / 100;
+  const daysLeft = prog.expiration_date ? daysUntil(prog.expiration_date) : null;
+  const expiring = daysLeft !== null && daysLeft >= 0 && daysLeft <= 60;
+  const catColor = CAT_CONFIG[prog.category]?.color || '#999';
+
+  return (
+    <button
+      onClick={() => onTap(prog.name)}
+      className="bg-white rounded-card p-4 shadow-sm border-l-4 text-left w-full hover:shadow-md transition-shadow"
+      style={{ borderLeftColor: catColor }}
+    >
+      <div className="flex items-start justify-between mb-2">
+        <div className="flex-1 min-w-0">
+          <div className="font-bold text-atlas-text text-sm truncate">{prog.name}</div>
+          <div className="text-xs text-atlas-muted">{prog.cpp}¢/pt</div>
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {expiring && (
+            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-pill ${daysLeft <= 30 ? 'bg-red-50 text-atlas-danger' : 'bg-yellow-50 text-yellow-700'}`}>{daysLeft}d</span>
+          )}
+          <div
+            onClick={(e) => { e.stopPropagation(); onToggleFav(prog.name); }}
+            className="p-1 rounded-lg hover:bg-atlas-bg"
+          >
+            <Star size={14} fill={prog.favorite ? '#e6a817' : 'none'} stroke={prog.favorite ? '#e6a817' : '#ccc'} strokeWidth={2} />
+          </div>
+        </div>
+      </div>
+      <div className="flex items-baseline justify-between">
+        <div className="text-xl font-extrabold text-atlas-text">{fmtCommas(prog.balance)}</div>
+        <div className="text-sm font-semibold text-atlas-success">≈ {formatCurrency(cashValue)}</div>
+      </div>
+    </button>
   );
 }
