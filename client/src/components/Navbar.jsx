@@ -1,12 +1,13 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { LayoutDashboard, Plane, CreditCard, MapPin, Menu, X, BarChart3, Bell, DollarSign } from 'lucide-react';
+import { LayoutDashboard, Plane, CreditCard, MapPin, Menu, X, BarChart3, Bell, DollarSign, Award } from 'lucide-react';
 
 const desktopLinks = [
   { to: '/', label: 'Dashboard' },
-  { to: '/destinations', label: 'Destinations' },
+  { to: '/trips', label: 'Trips' },
   { to: '/flights', label: 'Flights' },
   { to: '/points', label: 'Points' },
+  { to: '/status', label: 'Status' },
   { to: '/optimizer', label: 'Optimizer' },
   { to: '/alerts', label: 'Alerts' },
   { to: '/budget', label: 'Budget' },
@@ -16,10 +17,11 @@ const mobileTabs = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/flights', label: 'Flights', icon: Plane },
   { to: '/points', label: 'Points', icon: CreditCard },
-  { to: '/destinations', label: 'Places', icon: MapPin },
+  { to: '/trips', label: 'Trips', icon: MapPin },
 ];
 
 const moreLinks = [
+  { to: '/status', label: 'Status', icon: Award },
   { to: '/optimizer', label: 'Optimizer', icon: BarChart3 },
   { to: '/alerts', label: 'Alerts', icon: Bell },
   { to: '/budget', label: 'Budget', icon: DollarSign },
@@ -49,7 +51,10 @@ export default function Navbar() {
                   <ellipse cx="12" cy="12" rx="4" ry="10" />
                 </svg>
               </div>
-              <span className="text-xl font-extrabold text-atlas-text tracking-tight">Atlas</span>
+              <div className="flex flex-col leading-none">
+                <span className="text-xl font-extrabold text-atlas-text tracking-tight">ATLAS</span>
+                <span className="text-[9px] text-atlas-muted font-medium tracking-wider">by Forme</span>
+              </div>
             </Link>
             <div className="flex items-center gap-1">
               {desktopLinks.map((link) => {
@@ -72,7 +77,19 @@ export default function Navbar() {
 
       {/* Mobile header */}
       <header className="md:hidden bg-white border-b border-atlas-border sticky top-0 z-50 flex items-center justify-center h-14">
-        <span className="text-lg font-extrabold text-atlas-text tracking-tight">ATLAS</span>
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-full bg-atlas-green flex items-center justify-center">
+            <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="2" y1="12" x2="22" y2="12" />
+              <ellipse cx="12" cy="12" rx="4" ry="10" />
+            </svg>
+          </div>
+          <div className="flex flex-col leading-none">
+            <span className="text-lg font-extrabold text-atlas-text tracking-tight">ATLAS</span>
+            <span className="text-[8px] text-atlas-muted font-medium tracking-wider">by Forme</span>
+          </div>
+        </div>
       </header>
 
       {/* Mobile bottom tab bar */}

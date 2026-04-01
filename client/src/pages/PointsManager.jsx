@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Star } from 'lucide-react';
 import { api } from '../utils/api';
 import { formatCurrency, formatPoints, daysUntil } from '../utils/format';
 
@@ -35,19 +36,27 @@ const DEFAULT_PROGRAMS = [
   { name: 'IHG One Rewards', category: 'hotel', cpp: 0.5 },
   { name: 'Wyndham Rewards', category: 'hotel', cpp: 1.1 },
   { name: 'Choice Privileges', category: 'hotel', cpp: 0.6 },
+  // Rental Cars
+  { name: 'Avis Preferred Points', category: 'rental_car', cpp: 0.7 },
+  { name: 'Enterprise Plus', category: 'rental_car', cpp: 0.6 },
+  { name: 'Hertz Gold Plus', category: 'rental_car', cpp: 0.8 },
+  { name: 'National Emerald Club', category: 'rental_car', cpp: 0.7 },
+  { name: 'Budget Fastbreak', category: 'rental_car', cpp: 0.5 },
+  { name: 'Sixt Loyalty', category: 'rental_car', cpp: 0.6 },
 ];
 
 const CAT_CONFIG = {
   credit_card: { label: 'Credit Cards', color: '#1a1a1a' },
   airline: { label: 'Airlines', color: '#8bc34a' },
   hotel: { label: 'Hotels', color: '#999999' },
+  rental_car: { label: 'Rental Cars', color: '#e6a817' },
 };
-const CAT_ORDER = ['credit_card', 'airline', 'hotel'];
+const CAT_ORDER = ['credit_card', 'airline', 'hotel', 'rental_car'];
 
 function fmtCommas(n) { return n ? new Intl.NumberFormat('en-US').format(n) : ''; }
 function parseBal(s) { return parseInt(String(s).replace(/,/g, '')) || 0; }
 
-function SortableCard({ prog, balance, display, onBalanceChange, onBalanceBlur, onBalanceFocus, onExpChange, onExpBlur, onFlyClick, catColor }) {
+function SortableCard({ prog, balance, display, isFavorite, onBalanceChange, onBalanceBlur, onBalanceFocus, onExpChange, onExpBlur, onFlyClick, onToggleFavorite, catColor }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: prog.name });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
   const cashValue = (balance.balance * prog.cpp) / 100;
@@ -62,7 +71,10 @@ function SortableCard({ prog, balance, display, onBalanceChange, onBalanceBlur, 
           <div className="font-bold text-atlas-text text-sm">{prog.name}</div>
           <div className="text-xs text-atlas-muted mt-0.5">{prog.cpp}¢ per point</div>
         </div>
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
+          <button onClick={() => onToggleFavorite(prog.name)} className="p-1 rounded-lg hover:bg-atlas-bg transition-colors" title="Toggle favorite">
+            <Star size={14} fill={isFavorite ? '#e6a817' : 'none'} stroke={isFavorite ? '#e6a817' : '#999'} strokeWidth={2} />
+          </button>
           {expiring && (
             <span className={`text-xs font-semibold px-2 py-0.5 rounded-pill ${daysLeft <= 30 ? 'bg-red-50 text-atlas-danger' : 'bg-yellow-50 text-yellow-700'}`}>{daysLeft}d</span>
           )}
@@ -77,7 +89,7 @@ function SortableCard({ prog, balance, display, onBalanceChange, onBalanceBlur, 
       </div>
       <div className="flex items-center gap-2">
         <input type="date" value={balance.expiration_date} onChange={(e) => onExpChange(prog.name, e.target.value)} onBlur={() => onExpBlur(prog.name)} className="flex-1 text-xs !py-2 text-atlas-muted" />
-        {balance.balance > 0 && (
+        {balance.balance > 0 && prog.category !== 'rental_car' && (
           <button onClick={() => onFlyClick(prog.name)} className="text-xs font-semibold text-atlas-accent bg-atlas-bg px-3 py-1.5 rounded-pill hover:bg-atlas-border transition-colors whitespace-nowrap">
             Fly &#9992;
           </button>
@@ -99,6 +111,11 @@ export default function PointsManager() {
     DEFAULT_PROGRAMS.forEach((p) => { m[p.name] = ''; });
     return m;
   });
+  const [favorites, setFavorites] = useState(() => {
+    const m = {};
+    DEFAULT_PROGRAMS.forEach((p) => { m[p.name] = false; });
+    return m;
+  });
   const [order, setOrder] = useState(() => {
     const m = {};
     CAT_ORDER.forEach((cat) => { m[cat] = DEFAULT_PROGRAMS.filter((p) => p.category === cat).map((p) => p.name); });
@@ -113,28 +130,31 @@ export default function PointsManager() {
     api.getPoints().then((saved) => {
       const nb = { ...balances };
       const nd = { ...displayValues };
+      const nf = { ...favorites };
       for (const s of saved) {
         if (nb[s.program_name] !== undefined) {
           nb[s.program_name] = { balance: s.balance || 0, expiration_date: s.expiration_date || '' };
           nd[s.program_name] = s.balance > 0 ? fmtCommas(s.balance) : '';
+          nf[s.program_name] = !!s.favorite;
         }
       }
       setBalances(nb);
       setDisplayValues(nd);
+      setFavorites(nf);
       if (saved.length > 0) setLastUpdated(saved.reduce((a, b) => a.updated_at > b.updated_at ? a : b).updated_at);
     });
     setTimeout(() => setBarAnimated(true), 100);
   }, []);
 
-  const saveProgram = useCallback(async (name) => {
+  const saveProgram = useCallback(async (name, extraFields = {}) => {
     const b = balances[name];
     const p = DEFAULT_PROGRAMS.find((pr) => pr.name === name);
     if (!p) return;
     try {
-      await api.createPoint({ program_name: name, balance: b.balance, cpp: p.cpp, expiration_date: b.expiration_date || null });
+      await api.createPoint({ program_name: name, balance: b.balance, cpp: p.cpp, expiration_date: b.expiration_date || null, favorite: favorites[name] ? 1 : 0, ...extraFields });
       setLastUpdated(new Date().toISOString());
     } catch (e) { console.error('Save failed:', e); }
-  }, [balances]);
+  }, [balances, favorites]);
 
   const handleBalanceChange = (name, val) => {
     setDisplayValues((d) => ({ ...d, [name]: val }));
@@ -152,6 +172,17 @@ export default function PointsManager() {
   const handleExpChange = (name, date) => setBalances((b) => ({ ...b, [name]: { ...b[name], expiration_date: date } }));
   const handleExpBlur = (name) => saveProgram(name);
   const handleFlyClick = (name) => navigate(`/flights?program=${encodeURIComponent(name)}`);
+
+  const handleToggleFavorite = (name) => {
+    const newVal = !favorites[name];
+    setFavorites((f) => ({ ...f, [name]: newVal }));
+    // Save with new favorite status
+    const b = balances[name];
+    const p = DEFAULT_PROGRAMS.find((pr) => pr.name === name);
+    if (p) {
+      api.createPoint({ program_name: name, balance: b.balance, cpp: p.cpp, expiration_date: b.expiration_date || null, favorite: newVal ? 1 : 0 });
+    }
+  };
 
   const handleDragEnd = (cat, event) => {
     const { active, over } = event;
@@ -179,6 +210,30 @@ export default function PointsManager() {
     return r;
   }, [balances]);
 
+  const favoritePrograms = DEFAULT_PROGRAMS.filter((p) => favorites[p.name]);
+
+  const renderCard = (name) => {
+    const prog = DEFAULT_PROGRAMS.find((p) => p.name === name);
+    if (!prog) return null;
+    return (
+      <SortableCard
+        key={name}
+        prog={prog}
+        balance={balances[name] || { balance: 0, expiration_date: '' }}
+        display={displayValues[name] || ''}
+        isFavorite={!!favorites[name]}
+        onBalanceChange={handleBalanceChange}
+        onBalanceBlur={handleBalanceBlur}
+        onBalanceFocus={handleBalanceFocus}
+        onExpChange={handleExpChange}
+        onExpBlur={handleExpBlur}
+        onFlyClick={handleFlyClick}
+        onToggleFavorite={handleToggleFavorite}
+        catColor={CAT_CONFIG[prog.category].color}
+      />
+    );
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -193,24 +248,16 @@ export default function PointsManager() {
           <div className="text-5xl font-extrabold text-atlas-text tracking-tight">{formatCurrency(totals.total)}</div>
           <div className="text-sm text-atlas-muted mt-2">{formatPoints(totals.totalPoints)} points across {DEFAULT_PROGRAMS.length} programs</div>
         </div>
-
-        {/* Animated breakdown bar */}
         <div className="flex rounded-full overflow-hidden h-3 mb-4 bg-atlas-bg">
           {CAT_ORDER.map((cat) => {
             const pct = totals.total > 0 ? (totals[cat] / totals.total) * 100 : 0;
             if (pct < 0.5) return null;
             return (
-              <div
-                key={cat}
-                className="h-full transition-all duration-1000 ease-out"
-                style={{ width: barAnimated ? `${pct}%` : '0%', backgroundColor: CAT_CONFIG[cat].color }}
-                title={`${CAT_CONFIG[cat].label}: ${formatCurrency(totals[cat])} (${pct.toFixed(0)}%)`}
-              />
+              <div key={cat} className="h-full transition-all duration-1000 ease-out" style={{ width: barAnimated ? `${pct}%` : '0%', backgroundColor: CAT_CONFIG[cat].color }} title={`${CAT_CONFIG[cat].label}: ${formatCurrency(totals[cat])} (${pct.toFixed(0)}%)`} />
             );
           })}
         </div>
-
-        <div className="flex justify-center gap-8">
+        <div className="flex justify-center gap-6 flex-wrap">
           {CAT_ORDER.map((cat) => (
             <div key={cat} className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CAT_CONFIG[cat].color }} />
@@ -223,36 +270,29 @@ export default function PointsManager() {
         </div>
       </div>
 
+      {/* Favorites — only shown if any exist */}
+      {favoritePrograms.length > 0 && (
+        <div>
+          <h2 className="text-lg font-bold text-atlas-text mb-4 flex items-center gap-2">
+            <Star size={18} fill="#e6a817" stroke="#e6a817" /> Favorites
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {favoritePrograms.map((prog) => renderCard(prog.name))}
+          </div>
+        </div>
+      )}
+
       {/* Program Cards by Category with DnD */}
       {CAT_ORDER.map((cat) => {
         const catNames = order[cat];
         const config = CAT_CONFIG[cat];
-
         return (
           <div key={cat}>
             <h2 className="text-lg font-bold text-atlas-text mb-4">{config.label}</h2>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => handleDragEnd(cat, e)}>
               <SortableContext items={catNames} strategy={rectSortingStrategy}>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {catNames.map((name) => {
-                    const prog = DEFAULT_PROGRAMS.find((p) => p.name === name);
-                    if (!prog) return null;
-                    return (
-                      <SortableCard
-                        key={name}
-                        prog={prog}
-                        balance={balances[name] || { balance: 0, expiration_date: '' }}
-                        display={displayValues[name] || ''}
-                        onBalanceChange={handleBalanceChange}
-                        onBalanceBlur={handleBalanceBlur}
-                        onBalanceFocus={handleBalanceFocus}
-                        onExpChange={handleExpChange}
-                        onExpBlur={handleExpBlur}
-                        onFlyClick={handleFlyClick}
-                        catColor={config.color}
-                      />
-                    );
-                  })}
+                  {catNames.map((name) => renderCard(name))}
                 </div>
               </SortableContext>
             </DndContext>

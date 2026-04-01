@@ -7,8 +7,9 @@ import { formatCurrency, formatPoints } from '../utils/format';
 import AirportAutocomplete from '../components/AirportAutocomplete';
 
 const CABIN_CLASSES = [
+  { value: '1', label: 'Basic Economy' },
   { value: '1', label: 'Economy' },
-  { value: '2', label: 'Premium' },
+  { value: '2', label: 'Premium Economy' },
   { value: '3', label: 'Business' },
   { value: '4', label: 'First' },
 ];
@@ -38,6 +39,7 @@ export default function FlightSearch() {
   const [departDate, setDepartDate] = useState(null);
   const [returnDate, setReturnDate] = useState(null);
   const [cabinClass, setCabinClass] = useState('1');
+  const [tripType, setTripType] = useState('round-trip');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -155,23 +157,32 @@ export default function FlightSearch() {
       )}
 
       <form onSubmit={handleSearch} className="card">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
           <AirportAutocomplete value={origin} onChange={setOrigin} placeholder="City or code" label="From" />
           <AirportAutocomplete value={destination} onChange={setDestination} placeholder="City or code" label="To" />
+          <div>
+            <label className="stat-label block mb-2">Type</label>
+            <select value={tripType} onChange={(e) => { setTripType(e.target.value); if (e.target.value === 'one-way') setReturnDate(null); }} className="w-full">
+              <option value="round-trip">Round-trip</option>
+              <option value="one-way">One-way</option>
+            </select>
+          </div>
           <div>
             <label className="stat-label block mb-2">Depart</label>
             <DatePicker selected={departDate} onChange={handleDepartDateChange} minDate={new Date()} placeholderText="Select date" dateFormat="MMM d, yyyy" className="w-full" calendarClassName="atlas-calendar" popperPlacement="bottom-start" />
           </div>
-          <div>
-            <label className="stat-label block mb-2">
-              Return {returnDate && <button type="button" onClick={() => setReturnDate(null)} className="ml-1 text-atlas-danger font-normal normal-case tracking-normal hover:underline">clear</button>}
-            </label>
-            <DatePicker ref={returnRef} selected={returnDate} onChange={setReturnDate} minDate={departDate || new Date()} openToDate={departDate || new Date()} placeholderText={departDate ? 'Select return' : 'Pick depart first'} dateFormat="MMM d, yyyy" className="w-full" calendarClassName="atlas-calendar" popperPlacement="bottom-start" disabled={!departDate} />
-          </div>
+          {tripType === 'round-trip' && (
+            <div>
+              <label className="stat-label block mb-2">
+                Return {returnDate && <button type="button" onClick={() => setReturnDate(null)} className="ml-1 text-atlas-danger font-normal normal-case tracking-normal hover:underline">clear</button>}
+              </label>
+              <DatePicker ref={returnRef} selected={returnDate} onChange={setReturnDate} minDate={departDate || new Date()} openToDate={departDate || new Date()} placeholderText={departDate ? 'Select return' : 'Pick depart first'} dateFormat="MMM d, yyyy" className="w-full" calendarClassName="atlas-calendar" popperPlacement="bottom-start" disabled={!departDate} />
+            </div>
+          )}
           <div>
             <label className="stat-label block mb-2">Cabin</label>
             <select value={cabinClass} onChange={(e) => setCabinClass(e.target.value)} className="w-full">
-              {CABIN_CLASSES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+              {CABIN_CLASSES.map((c, i) => <option key={`${c.value}-${i}`} value={c.value}>{c.label}</option>)}
             </select>
           </div>
         </div>

@@ -107,6 +107,28 @@ function migrate(db) {
       created_at TEXT DEFAULT (datetime('now'))
     )
   `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS loyalty_status (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      program_name TEXT NOT NULL UNIQUE,
+      category TEXT NOT NULL,
+      status_level TEXT DEFAULT '',
+      alliance TEXT DEFAULT '',
+      expiration_date TEXT,
+      notes TEXT DEFAULT '',
+      updated_at TEXT DEFAULT (datetime('now'))
+    )
+  `);
+
+  // Add new columns to trips if missing
+  try { db.run("ALTER TABLE trips ADD COLUMN travel_class TEXT DEFAULT ''"); } catch(e) {}
+  try { db.run("ALTER TABLE trips ADD COLUMN ticket_cost REAL DEFAULT 0"); } catch(e) {}
+  try { db.run("ALTER TABLE trips ADD COLUMN trip_type TEXT DEFAULT 'round-trip'"); } catch(e) {}
+  try { db.run("ALTER TABLE trips ADD COLUMN alliance TEXT DEFAULT ''"); } catch(e) {}
+
+  // Add favorite column to points_balances if missing
+  try { db.run("ALTER TABLE points_balances ADD COLUMN favorite INTEGER DEFAULT 0"); } catch(e) {}
 }
 
 // Helper functions to make sql.js easier to use like better-sqlite3

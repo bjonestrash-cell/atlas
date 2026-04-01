@@ -30,15 +30,16 @@ router.post('/bulk', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  const { program_name, balance, cpp, expiration_date } = req.body;
+  const { program_name, balance, cpp, expiration_date, favorite } = req.body;
   const existing = get('SELECT id FROM points_balances WHERE program_name = ?', [program_name]);
+  const fav = favorite !== undefined ? (favorite ? 1 : 0) : 0;
   if (existing) {
-    run(`UPDATE points_balances SET balance=?, cpp=?, expiration_date=?, updated_at=datetime('now') WHERE program_name=?`,
-      [balance || 0, cpp || 1.0, expiration_date || null, program_name]);
+    run(`UPDATE points_balances SET balance=?, cpp=?, expiration_date=?, favorite=?, updated_at=datetime('now') WHERE program_name=?`,
+      [balance || 0, cpp || 1.0, expiration_date || null, fav, program_name]);
     return res.json(get('SELECT * FROM points_balances WHERE program_name = ?', [program_name]));
   }
-  const result = run(`INSERT INTO points_balances (program_name, balance, cpp, expiration_date) VALUES (?, ?, ?, ?)`,
-    [program_name, balance || 0, cpp || 1.0, expiration_date || null]);
+  const result = run(`INSERT INTO points_balances (program_name, balance, cpp, expiration_date, favorite) VALUES (?, ?, ?, ?, ?)`,
+    [program_name, balance || 0, cpp || 1.0, expiration_date || null, fav]);
   res.status(201).json(get('SELECT * FROM points_balances WHERE id = ?', [result.lastInsertRowid]));
 });
 

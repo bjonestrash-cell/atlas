@@ -38,6 +38,11 @@ export const api = {
   updateAlert: (id, data) => request(`/alerts/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteAlert: (id) => request(`/alerts/${id}`, { method: 'DELETE' }),
 
+  // Status
+  getStatus: () => request('/status'),
+  saveStatus: (data) => request('/status', { method: 'POST', body: JSON.stringify(data) }),
+  deleteStatus: (id) => request(`/status/${id}`, { method: 'DELETE' }),
+
   // Budget
   getBudget: (params) => request(`/budget${params ? '?' + new URLSearchParams(params) : ''}`),
   getBudgetSummary: (year) => request(`/budget/summary${year ? '?year=' + year : ''}`),
