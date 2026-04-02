@@ -42,10 +42,10 @@ const ALL_PROGRAMS = [
 ];
 
 const CAT_CONFIG = {
-  credit_card: { label: 'Credit Cards', color: '#1a1a1a' },
-  airline: { label: 'Airlines', color: '#8bc34a' },
-  hotel: { label: 'Hotels', color: '#999999' },
-  rental_car: { label: 'Rental Cars', color: '#e6a817' },
+  credit_card: { label: 'Credit Cards', color: '#0D0D0B' },
+  airline: { label: 'Airlines', color: '#8C7355' },
+  hotel: { label: 'Hotels', color: '#C4B9A8' },
+  rental_car: { label: 'Rental Cars', color: '#B39370' },
 };
 const CAT_ORDER = ['credit_card', 'airline', 'hotel', 'rental_car'];
 
@@ -62,10 +62,10 @@ function BottomSheet({ open, onClose, children }) {
 
   return (
     <div className={`fixed inset-0 z-50 transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/20" onClick={onClose} />
       <div
-        className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[92vh] flex flex-col transition-transform duration-300 ease-out ${open ? 'translate-y-0' : 'translate-y-full'}`}
-        style={{ boxShadow: '0 -8px 40px rgba(0,0,0,0.15)' }}
+        className={`absolute bottom-0 left-0 right-0 bg-atlas-surface max-h-[92vh] flex flex-col transition-transform duration-300 ease-out ${open ? 'translate-y-0' : 'translate-y-full'}`}
+        style={{ boxShadow: '0 -8px 40px rgba(13,13,11,0.1)' }}
       >
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-10 h-1 rounded-full bg-atlas-border" />
@@ -113,14 +113,14 @@ function PortfolioBar({ totals, barAnimated }) {
           className="absolute bottom-full mb-2.5 -translate-x-1/2 pointer-events-none z-10"
           style={{ left: tooltipX, animation: 'fadeIn 150ms ease-out' }}
         >
-          <div className="bg-white rounded-xl px-3.5 py-2.5 shadow-lg border border-atlas-border text-left whitespace-nowrap">
+          <div className="bg-atlas-surface px-3.5 py-2.5 border border-atlas-border text-left whitespace-nowrap" style={{ boxShadow: '0 8px 24px rgba(13,13,11,0.1)' }}>
             <div className="text-xs font-bold text-atlas-text mb-0.5">{CAT_CONFIG[hovered].label}</div>
             <div className="text-sm font-extrabold text-atlas-text">{formatCurrency(totals[hovered])}</div>
             <div className="text-[10px] text-atlas-muted mt-0.5">
               {formatPoints(totals[hovered + '_pts'])} pts · {totals.total > 0 ? ((totals[hovered] / totals.total) * 100).toFixed(1) : 0}%
             </div>
           </div>
-          <div className="w-2 h-2 bg-white border-b border-r border-atlas-border rotate-45 mx-auto -mt-1.5" />
+          <div className="w-2 h-2 bg-atlas-surface border-b border-r border-atlas-border rotate-45 mx-auto -mt-1.5" />
         </div>
       )}
       {/* Bar */}
@@ -489,7 +489,7 @@ function PortfolioCard({ prog, onTap, onToggleFav }) {
   return (
     <button
       onClick={() => onTap(prog.name)}
-      className="bg-white rounded-card p-4 shadow-sm border-l-4 text-left w-full hover:shadow-md transition-shadow"
+      className="bg-atlas-surface p-4 shadow-sm border-l-4 text-left w-full hover:shadow-md transition-shadow"
       style={{ borderLeftColor: catColor }}
     >
       <div className="flex items-start justify-between mb-2">

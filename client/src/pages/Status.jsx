@@ -93,9 +93,9 @@ const ALL_PROGRAMS = [
 ];
 
 const CAT_CONFIG = {
-  airline: { label: 'Airlines', color: '#8bc34a', Icon: Plane },
-  hotel: { label: 'Hotels', color: '#999999', Icon: Building2 },
-  rental_car: { label: 'Rental Cars', color: '#e6a817', Icon: Car },
+  airline: { label: 'Airlines', color: '#8C7355', Icon: Plane },
+  hotel: { label: 'Hotels', color: '#C4B9A8', Icon: Building2 },
+  rental_car: { label: 'Rental Cars', color: '#B39370', Icon: Car },
 };
 const CAT_ORDER = ['airline', 'hotel', 'rental_car'];
 
@@ -107,8 +107,8 @@ function BottomSheet({ open, onClose, children }) {
   }, [open]);
   return (
     <div className={`fixed inset-0 z-50 transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[92vh] flex flex-col transition-transform duration-300 ease-out ${open ? 'translate-y-0' : 'translate-y-full'}`} style={{ boxShadow: '0 -8px 40px rgba(0,0,0,0.15)' }}>
+      <div className="absolute inset-0 bg-black/20" onClick={onClose} />
+      <div className={`absolute bottom-0 left-0 right-0 bg-atlas-surface max-h-[92vh] flex flex-col transition-transform duration-300 ease-out ${open ? 'translate-y-0' : 'translate-y-full'}`} style={{ boxShadow: '0 -8px 40px rgba(13,13,11,0.1)' }}>
         <div className="flex justify-center pt-3 pb-1"><div className="w-10 h-1 rounded-full bg-atlas-border" /></div>
         {children}
       </div>
@@ -269,7 +269,7 @@ export default function Status() {
                   <button
                     key={s.name}
                     onClick={() => openEditSheet(s.name)}
-                    className="bg-white rounded-card p-4 shadow-sm border-l-4 text-left w-full hover:shadow-md transition-shadow"
+                    className="bg-atlas-surface p-4 shadow-sm border-l-4 text-left w-full hover:shadow-md transition-shadow"
                     style={{ borderLeftColor: config.color }}
                   >
                     <div className="flex items-start justify-between mb-1.5">

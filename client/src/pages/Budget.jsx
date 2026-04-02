@@ -69,13 +69,13 @@ export default function Budget() {
         <h2 className="text-lg font-bold text-atlas-text mb-5">Monthly Budget vs. Actual</h2>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-            <XAxis dataKey="name" stroke="#999" fontSize={12} />
-            <YAxis stroke="#999" fontSize={12} tickFormatter={(v) => `$${v}`} />
-            <Tooltip contentStyle={{ background: '#fff', border: '1px solid #eee', borderRadius: '12px', color: '#1a1a1a', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }} formatter={(v) => formatCurrency(v)} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#E8DFD0" />
+            <XAxis dataKey="name" stroke="#C4B9A8" fontSize={12} />
+            <YAxis stroke="#C4B9A8" fontSize={12} tickFormatter={(v) => `$${v}`} />
+            <Tooltip contentStyle={{ background: '#F0EBE1', border: '1px solid #E8DFD0', borderRadius: '2px', color: '#0D0D0B', boxShadow: '0 4px 16px rgba(13,13,11,0.08)' }} formatter={(v) => formatCurrency(v)} />
             <Legend />
-            <Bar dataKey="Planned" fill="#eee" radius={[6, 6, 0, 0]} />
-            <Bar dataKey="Actual" fill="#1a1a1a" radius={[6, 6, 0, 0]} />
+            <Bar dataKey="Planned" fill="#E8DFD0" radius={[6, 6, 0, 0]} />
+            <Bar dataKey="Actual" fill="#8C7355" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -84,13 +84,13 @@ export default function Budget() {
         <h2 className="text-lg font-bold text-atlas-text mb-5">Cumulative Spend</h2>
         <ResponsiveContainer width="100%" height={250}>
           <LineChart data={cumulativeData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-            <XAxis dataKey="name" stroke="#999" fontSize={12} />
-            <YAxis stroke="#999" fontSize={12} tickFormatter={(v) => `$${v}`} />
-            <Tooltip contentStyle={{ background: '#fff', border: '1px solid #eee', borderRadius: '12px', color: '#1a1a1a', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }} formatter={(v) => formatCurrency(v)} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#E8DFD0" />
+            <XAxis dataKey="name" stroke="#C4B9A8" fontSize={12} />
+            <YAxis stroke="#C4B9A8" fontSize={12} tickFormatter={(v) => `$${v}`} />
+            <Tooltip contentStyle={{ background: '#F0EBE1', border: '1px solid #E8DFD0', borderRadius: '2px', color: '#0D0D0B', boxShadow: '0 4px 16px rgba(13,13,11,0.08)' }} formatter={(v) => formatCurrency(v)} />
             <Legend />
-            <Line type="monotone" dataKey="Planned" stroke="#ddd" strokeWidth={2} dot={false} strokeDasharray="5 5" />
-            <Line type="monotone" dataKey="Actual" stroke="#1a1a1a" strokeWidth={2.5} dot={{ r: 3, fill: '#1a1a1a' }} />
+            <Line type="monotone" dataKey="Planned" stroke="#C4B9A8" strokeWidth={2} dot={false} strokeDasharray="5 5" />
+            <Line type="monotone" dataKey="Actual" stroke="#8C7355" strokeWidth={2.5} dot={{ r: 3, fill: '#1a1a1a' }} />
           </LineChart>
         </ResponsiveContainer>
       </div>

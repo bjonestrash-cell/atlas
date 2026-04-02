@@ -15,10 +15,10 @@ const TABS = [
 ];
 
 const CAT_CONFIG = {
-  credit_card: { label: 'Credit Cards', color: '#1a1a1a' },
-  airline: { label: 'Airlines', color: '#8bc34a' },
-  hotel: { label: 'Hotels', color: '#999999' },
-  rental_car: { label: 'Rental Cars', color: '#e6a817' },
+  credit_card: { label: 'Credit Cards', color: '#0D0D0B' },
+  airline: { label: 'Airlines', color: '#8C7355' },
+  hotel: { label: 'Hotels', color: '#C4B9A8' },
+  rental_car: { label: 'Rental Cars', color: '#B39370' },
 };
 const CAT_ORDER = ['credit_card', 'airline', 'hotel', 'rental_car'];
 
@@ -204,13 +204,14 @@ export default function Alerts() {
               key={tab.key}
               onClick={() => !disabled && handleTabChange(tab.key)}
               disabled={disabled}
-              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`flex items-center gap-1.5 px-4 py-2.5 text-[10px] tracking-[0.15em] uppercase whitespace-nowrap transition-all ${
                 isActive
-                  ? 'bg-atlas-accent text-white shadow-sm'
+                  ? 'bg-atlas-accent text-white'
                   : disabled
-                    ? 'bg-atlas-bg text-atlas-border cursor-not-allowed'
-                    : 'bg-white text-atlas-sub hover:bg-atlas-bg border border-atlas-border'
+                    ? 'text-atlas-border cursor-not-allowed'
+                    : 'text-atlas-sub hover:text-atlas-text border border-atlas-border'
               }`}
+              style={{ borderRadius: '1px', fontWeight: isActive ? 400 : 300 }}
             >
               <Icon size={13} strokeWidth={isActive ? 2.5 : 1.5} />
               {tab.label}
