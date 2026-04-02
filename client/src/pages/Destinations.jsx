@@ -53,7 +53,7 @@ export default function Destinations() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-atlas-text">Trips</h1>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 300, color: 'var(--ink)' }}>Trips</h1>
         <button onClick={openNew} className="btn-primary">+ Add Trip</button>
       </div>
 
@@ -76,8 +76,8 @@ export default function Destinations() {
           <div key={trip.id} className="card flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-semibold text-atlas-text truncate">{trip.destination}</h3>
-                <span className={`text-xs px-2 py-0.5 rounded border ${STATUS_BG[trip.status]}`}>{trip.status}</span>
+                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 400, color: 'var(--ink)' }} className="truncate">{trip.destination}</h3>
+                <span style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--slate)', border: '1px solid var(--stone)', padding: '2px 8px' }}>{trip.status}</span>
               </div>
               <div className="text-sm text-atlas-sub space-y-0.5">
                 <div>{formatDate(trip.start_date)} – {formatDate(trip.end_date)}</div>

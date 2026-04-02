@@ -62,13 +62,13 @@ function BottomSheet({ open, onClose, children }) {
 
   return (
     <div className={`fixed inset-0 z-50 transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-      <div className="absolute inset-0 bg-black/20" onClick={onClose} />
+      <div className="absolute inset-0" style={{ background: 'rgba(28,26,23,0.6)' }} onClick={onClose} />
       <div
-        className={`absolute bottom-0 left-0 right-0 bg-atlas-surface max-h-[92vh] flex flex-col transition-transform duration-300 ease-out ${open ? 'translate-y-0' : 'translate-y-full'}`}
-        style={{ boxShadow: '0 -8px 40px rgba(13,13,11,0.1)' }}
+        className={`absolute bottom-0 left-0 right-0 max-h-[92vh] flex flex-col transition-transform duration-300 ease-out ${open ? 'translate-y-0' : 'translate-y-full'}`}
+        style={{ background: 'var(--cream)', borderTop: '1px solid var(--stone)', boxShadow: '0 -16px 48px rgba(28,26,23,0.06)' }}
       >
         <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full bg-atlas-border" />
+          <div className="w-10 h-px" style={{ background: 'var(--stone)' }} />
         </div>
         {children}
       </div>
@@ -113,18 +113,18 @@ function PortfolioBar({ totals, barAnimated }) {
           className="absolute bottom-full mb-2.5 -translate-x-1/2 pointer-events-none z-10"
           style={{ left: tooltipX, animation: 'fadeIn 150ms ease-out' }}
         >
-          <div className="bg-atlas-surface px-3.5 py-2.5 border border-atlas-border text-left whitespace-nowrap" style={{ boxShadow: '0 8px 24px rgba(13,13,11,0.1)' }}>
-            <div className="text-xs font-bold text-atlas-text mb-0.5">{CAT_CONFIG[hovered].label}</div>
-            <div className="text-sm font-extrabold text-atlas-text">{formatCurrency(totals[hovered])}</div>
-            <div className="text-[10px] text-atlas-muted mt-0.5">
+          <div className="text-left whitespace-nowrap" style={{ background: 'var(--cream)', border: '1px solid var(--stone)', padding: '12px 16px', boxShadow: '0 16px 48px rgba(28,26,23,0.06)' }}>
+            <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 400, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--slate)', marginBottom: 4 }}>{CAT_CONFIG[hovered].label}</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 300, color: 'var(--ink)' }}>{formatCurrency(totals[hovered])}</div>
+            <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 300, color: 'var(--slate)', marginTop: 2 }}>
               {formatPoints(totals[hovered + '_pts'])} pts · {totals.total > 0 ? ((totals[hovered] / totals.total) * 100).toFixed(1) : 0}%
             </div>
           </div>
-          <div className="w-2 h-2 bg-atlas-surface border-b border-r border-atlas-border rotate-45 mx-auto -mt-1.5" />
+          <div className="w-2 h-2 rotate-45 mx-auto -mt-1.5" style={{ background: 'var(--cream)', borderBottom: '1px solid var(--stone)', borderRight: '1px solid var(--stone)' }} />
         </div>
       )}
       {/* Bar */}
-      <div className="flex rounded-full overflow-hidden h-4 bg-atlas-bg">
+      <div className="flex overflow-hidden h-3" style={{ background: 'var(--sand)' }}>
         {CAT_ORDER.map((cat) => {
           const pct = totals.total > 0 ? (totals[cat] / totals.total) * 100 : 0;
           if (pct < 0.5) return null;
@@ -295,20 +295,20 @@ export default function PointsManager() {
   const editCashValue = editProgramDef ? (parseBal(editBalance) * editProgramDef.cpp) / 100 : 0;
 
   return (
-    <div className="space-y-6">
+    <div>
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-atlas-text">Points Portfolio</h1>
+      <div className="flex items-center justify-between mb-16">
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 300, color: 'var(--ink)' }}>Points Portfolio</h1>
         <button onClick={openAddSheet} className="btn-primary flex items-center gap-2">
-          <Plus size={18} /> Add Points
+          <Plus size={14} strokeWidth={1} /> Add Points
         </button>
       </div>
 
       {/* Hero / Summary */}
-      <div className="card text-center">
-        <div className="stat-label mb-2">Total Portfolio Value</div>
-        <div className="text-5xl font-extrabold text-atlas-text tracking-tight">{formatCurrency(totals.total)}</div>
-        <div className="text-sm text-atlas-muted mt-2">
+      <div className="text-center mb-16" style={{ borderTop: '1px solid var(--stone)', borderBottom: '1px solid var(--stone)', padding: '48px 0' }}>
+        <div className="stat-label mb-4">Total Portfolio Value</div>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 300, color: 'var(--ink)', lineHeight: 1 }}>{formatCurrency(totals.total)}</div>
+        <div className="mt-4" style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: 'var(--slate)' }}>
           {totalCount > 0
             ? `${formatPoints(totals.totalPoints)} points across ${totalCount} programs`
             : 'Add your first loyalty program to get started'}
@@ -332,20 +332,19 @@ export default function PointsManager() {
 
       {/* Empty state */}
       {totalCount === 0 && (
-        <div className="text-center py-12">
-          <div className="text-5xl mb-4 opacity-15">&#128179;</div>
-          <p className="text-atlas-muted font-medium mb-4">No points programs added yet</p>
-          <button onClick={openAddSheet} className="btn-secondary inline-flex items-center gap-2">
-            <Plus size={16} /> Add Your First Program
+        <div className="text-center py-20">
+          <p style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, fontStyle: 'italic', color: 'var(--slate)', marginBottom: 24 }}>No programmes recorded.</p>
+          <button onClick={openAddSheet} className="btn-primary inline-flex items-center gap-2">
+            <Plus size={14} strokeWidth={1} /> Add Your First Programme
           </button>
         </div>
       )}
 
       {/* Favorites pinned at top */}
       {favoriteCards.length > 0 && (
-        <div>
-          <h2 className="text-sm font-bold text-atlas-text mb-3 flex items-center gap-1.5 uppercase tracking-wider">
-            <Star size={14} fill="#e6a817" stroke="#e6a817" /> Favorites
+        <div className="mb-16">
+          <h2 className="stat-label mb-4 flex items-center gap-2">
+            <Star size={12} fill="var(--bronze)" stroke="var(--bronze)" /> Favourites
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {favoriteCards.map((prog) => (
@@ -355,13 +354,13 @@ export default function PointsManager() {
         </div>
       )}
 
-      {/* Cards by category — only categories with active programs */}
+      {/* Cards by category */}
       {CAT_ORDER.map((cat) => {
         const catProgs = activePrograms.filter((p) => p.category === cat);
         if (catProgs.length === 0) return null;
         return (
-          <div key={cat}>
-            <h2 className="text-sm font-bold text-atlas-text mb-3 uppercase tracking-wider">{CAT_CONFIG[cat].label}</h2>
+          <div key={cat} className="mb-16">
+            <h2 className="stat-label mb-4">{CAT_CONFIG[cat].label}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {catProgs.map((prog) => (
                 <PortfolioCard key={prog.name} prog={prog} onTap={openEditSheet} onToggleFav={toggleFavorite} />
@@ -376,7 +375,7 @@ export default function PointsManager() {
         {sheetMode === 'pick' ? (
           <div className="flex flex-col overflow-hidden">
             <div className="px-5 pb-3 pt-2">
-              <h2 className="text-lg font-bold text-atlas-text mb-3">Add Points Program</h2>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--ink)', marginBottom: 16 }}>Add Points Programme</h2>
               <div className="relative">
                 <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-atlas-muted" />
                 <input
@@ -432,8 +431,8 @@ export default function PointsManager() {
           <div className="px-5 pb-8 pt-2">
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="text-lg font-bold text-atlas-text">{editName}</h2>
-                {editProgramDef && <div className="text-xs text-atlas-muted">{editProgramDef.cpp}¢ per point · {CAT_CONFIG[editProgramDef.category]?.label}</div>}
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 400, color: 'var(--ink)' }}>{editName}</h2>
+                {editProgramDef && <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: 'var(--slate)' }}>{editProgramDef.cpp}¢ per point · {CAT_CONFIG[editProgramDef.category]?.label}</div>}
               </div>
               <button onClick={() => setSheetMode('pick')} className="text-sm text-atlas-muted hover:text-atlas-text font-medium">Change</button>
             </div>
@@ -489,29 +488,28 @@ function PortfolioCard({ prog, onTap, onToggleFav }) {
   return (
     <button
       onClick={() => onTap(prog.name)}
-      className="bg-atlas-surface p-4 shadow-sm border-l-4 text-left w-full hover:shadow-md transition-shadow"
-      style={{ borderLeftColor: catColor }}
+      className="text-left w-full transition-all"
+      style={{ background: 'var(--mist)', border: '1px solid var(--sand)', borderLeft: '1px solid ' + catColor, padding: 24 }}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--stone)'; e.currentTarget.style.boxShadow = '0 16px 48px rgba(28,26,23,0.06)'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--sand)'; e.currentTarget.style.borderLeftColor = catColor; e.currentTarget.style.boxShadow = 'none'; }}
     >
-      <div className="flex items-start justify-between mb-2">
+      <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
-          <div className="font-bold text-atlas-text text-sm truncate">{prog.name}</div>
-          <div className="text-xs text-atlas-muted">{prog.cpp}¢/pt</div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 400, color: 'var(--ink)' }} className="truncate">{prog.name}</div>
+          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 400, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--slate)' }}>{prog.cpp}¢ per point</div>
         </div>
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {expiring && (
-            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-pill ${daysLeft <= 30 ? 'bg-red-50 text-atlas-danger' : 'bg-yellow-50 text-yellow-700'}`}>{daysLeft}d</span>
+            <span style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.15em', textTransform: 'uppercase', color: daysLeft <= 30 ? '#9B5B4F' : 'var(--slate)', border: '1px solid var(--stone)', padding: '2px 8px' }}>{daysLeft}d</span>
           )}
-          <div
-            onClick={(e) => { e.stopPropagation(); onToggleFav(prog.name); }}
-            className="p-1 rounded-lg hover:bg-atlas-bg"
-          >
-            <Star size={14} fill={prog.favorite ? '#e6a817' : 'none'} stroke={prog.favorite ? '#e6a817' : '#ccc'} strokeWidth={2} />
+          <div onClick={(e) => { e.stopPropagation(); onToggleFav(prog.name); }} className="p-1">
+            <Star size={14} fill={prog.favorite ? 'var(--bronze)' : 'none'} stroke={prog.favorite ? 'var(--bronze)' : 'var(--stone)'} strokeWidth={1.5} />
           </div>
         </div>
       </div>
       <div className="flex items-baseline justify-between">
-        <div className="text-xl font-extrabold text-atlas-text">{fmtCommas(prog.balance)}</div>
-        <div className="text-sm font-semibold text-atlas-success">≈ {formatCurrency(cashValue)}</div>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 300, color: 'var(--ink)' }}>{fmtCommas(prog.balance)}</div>
+        <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: 'var(--slate)' }}>≈ {formatCurrency(cashValue)}</div>
       </div>
     </button>
   );

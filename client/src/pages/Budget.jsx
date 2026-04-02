@@ -54,7 +54,7 @@ export default function Budget() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-atlas-text">Budget</h1>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 300, color: 'var(--ink)' }}>Budget</h1>
         <button onClick={() => setShowModal(true)} className="btn-primary">+ Add Entry</button>
       </div>
 
@@ -66,7 +66,7 @@ export default function Budget() {
       </div>
 
       <div className="card">
-        <h2 className="text-lg font-bold text-atlas-text mb-5">Monthly Budget vs. Actual</h2>
+        <h2 className="mb-5" style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 300, color: 'var(--ink)' }}>Monthly Budget vs. Actual</h2>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E8DFD0" />
@@ -74,14 +74,14 @@ export default function Budget() {
             <YAxis stroke="#C4B9A8" fontSize={12} tickFormatter={(v) => `$${v}`} />
             <Tooltip contentStyle={{ background: '#F0EBE1', border: '1px solid #E8DFD0', borderRadius: '2px', color: '#0D0D0B', boxShadow: '0 4px 16px rgba(13,13,11,0.08)' }} formatter={(v) => formatCurrency(v)} />
             <Legend />
-            <Bar dataKey="Planned" fill="#E8DFD0" radius={[6, 6, 0, 0]} />
-            <Bar dataKey="Actual" fill="#8C7355" radius={[6, 6, 0, 0]} />
+            <Bar dataKey="Planned" fill="#E8DFD0" radius={[0, 0, 0, 0]} />
+            <Bar dataKey="Actual" fill="#8C7355" radius={[0, 0, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
       <div className="card">
-        <h2 className="text-lg font-bold text-atlas-text mb-5">Cumulative Spend</h2>
+        <h2 className="mb-5" style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 300, color: 'var(--ink)' }}>Cumulative Spend</h2>
         <ResponsiveContainer width="100%" height={250}>
           <LineChart data={cumulativeData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E8DFD0" />
@@ -90,14 +90,14 @@ export default function Budget() {
             <Tooltip contentStyle={{ background: '#F0EBE1', border: '1px solid #E8DFD0', borderRadius: '2px', color: '#0D0D0B', boxShadow: '0 4px 16px rgba(13,13,11,0.08)' }} formatter={(v) => formatCurrency(v)} />
             <Legend />
             <Line type="monotone" dataKey="Planned" stroke="#C4B9A8" strokeWidth={2} dot={false} strokeDasharray="5 5" />
-            <Line type="monotone" dataKey="Actual" stroke="#8C7355" strokeWidth={2.5} dot={{ r: 3, fill: '#1a1a1a' }} />
+            <Line type="monotone" dataKey="Actual" stroke="#8C7355" strokeWidth={2.5} dot={{ r: 3, fill: '#8B6F47' }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
       {summary.byCategory.length > 0 && (
         <div className="card">
-          <h2 className="text-lg font-bold text-atlas-text mb-5">By Category</h2>
+          <h2 className="mb-5" style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 300, color: 'var(--ink)' }}>By Category</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Array.from(new Set(summary.byCategory.map((c) => c.category))).map((cat) => {
               const planned = summary.byCategory.find((c) => c.category === cat && c.type === 'planned');
@@ -119,7 +119,7 @@ export default function Budget() {
       )}
 
       <div className="card">
-        <h2 className="text-lg font-bold text-atlas-text mb-5">Recent Entries</h2>
+        <h2 className="mb-5" style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 300, color: 'var(--ink)' }}>Recent Entries</h2>
         {entries.length === 0 ? (
           <p className="text-atlas-muted text-sm">No budget entries yet.</p>
         ) : (

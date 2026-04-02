@@ -1,12 +1,12 @@
 export default function StatCard({ label, value, sub, accent }) {
   return (
-    <div className="card flex flex-col gap-3">
+    <div className="flex flex-col gap-4 py-0">
       <span className="stat-label">{label}</span>
       <div className="flex items-center gap-2">
-        {accent && <div className="w-1.5 h-6 bg-atlas-accent shrink-0" />}
+        {accent && <div className="w-px h-8 shrink-0" style={{ background: 'var(--bronze)' }} />}
         <span className="stat-value">{value}</span>
       </div>
-      {sub && <span className="text-xs text-atlas-muted font-light tracking-wide">{sub}</span>}
+      {sub && <span style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: 'var(--slate)' }}>{sub}</span>}
     </div>
   );
 }

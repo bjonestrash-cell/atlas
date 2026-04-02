@@ -133,7 +133,7 @@ export default function FlightSearch() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-atlas-text">Flights</h1>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 300, color: 'var(--ink)' }}>Flights</h1>
         <div className="flex rounded-btn overflow-hidden border border-atlas-border">
           <button type="button" onClick={() => setMode('cash')} className={`px-5 py-2 text-sm font-semibold transition-colors ${mode === 'cash' ? 'bg-atlas-accent text-white' : 'bg-white text-atlas-sub'}`}>Cash</button>
           <button type="button" onClick={() => setMode('points')} className={`px-5 py-2 text-sm font-semibold transition-colors ${mode === 'points' ? 'bg-atlas-accent text-white' : 'bg-white text-atlas-sub'}`}>Points</button>

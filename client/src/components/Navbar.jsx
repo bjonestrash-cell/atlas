@@ -39,81 +39,113 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Desktop nav */}
-      <nav className="hidden md:block border-b border-atlas-border sticky top-0 z-50" style={{ backgroundColor: '#FAF7F2' }}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-baseline gap-3">
-              <span className="font-display text-2xl font-light tracking-wide text-atlas-text" style={{ letterSpacing: '0.12em' }}>ATLAS</span>
-              <span className="text-[9px] tracking-[0.2em] uppercase text-atlas-soft font-light">by Forme</span>
-            </Link>
-            <div className="flex items-center gap-0">
-              {desktopLinks.map((link) => {
-                const active = isActive(location.pathname, link.to);
-                return (
-                  <Link
-                    key={link.to}
-                    to={link.to}
-                    className={`relative px-4 py-2 text-[11px] tracking-[0.15em] uppercase transition-colors whitespace-nowrap ${active ? 'text-atlas-text' : 'text-atlas-soft hover:text-atlas-text'}`}
-                    style={{ fontWeight: active ? 400 : 300 }}
-                  >
-                    {link.label}
-                    {active && <span className="absolute bottom-0 left-4 right-4 h-px bg-atlas-accent" />}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
+      {/* Desktop nav — fixed, frosted glass */}
+      <nav
+        className="hidden md:flex items-center justify-between fixed top-0 left-0 right-0 z-[1000] h-14 px-12"
+        style={{ background: 'rgba(250,247,242,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(212,202,184,0.4)' }}
+      >
+        <Link to="/" className="flex items-baseline gap-0">
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 300, letterSpacing: '0.35em', color: 'var(--ink)', textTransform: 'uppercase' }}>
+            Atlas
+          </span>
+          <span style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 300, letterSpacing: '0.3em', color: 'var(--slate)', textTransform: 'uppercase', marginLeft: 12, paddingLeft: 12, borderLeft: '1px solid var(--stone)' }}>
+            by Forme
+          </span>
+        </Link>
+        <div className="flex items-center">
+          {desktopLinks.map((link) => {
+            const active = isActive(location.pathname, link.to);
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="transition-colors"
+                style={{
+                  fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 400, letterSpacing: '0.2em',
+                  textTransform: 'uppercase', textDecoration: 'none', padding: '0 16px',
+                  color: active ? 'var(--ink)' : 'var(--slate)',
+                  borderBottom: active ? '1px solid var(--bronze)' : '1px solid transparent',
+                  paddingBottom: 2,
+                }}
+                onMouseEnter={(e) => { if (!active) e.target.style.color = 'var(--bronze)'; }}
+                onMouseLeave={(e) => { if (!active) e.target.style.color = 'var(--slate)'; }}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
       </nav>
 
       {/* Mobile header */}
-      <header className="md:hidden border-b border-atlas-border sticky top-0 z-50 flex items-center justify-center h-14" style={{ backgroundColor: '#FAF7F2' }}>
-        <div className="flex items-baseline gap-2">
-          <span className="font-display text-xl font-light tracking-[0.12em] text-atlas-text">ATLAS</span>
-          <span className="text-[8px] tracking-[0.2em] uppercase text-atlas-soft font-light">by Forme</span>
+      <header
+        className="md:hidden fixed top-0 left-0 right-0 z-[1000] flex items-center justify-center h-14"
+        style={{ background: 'rgba(250,247,242,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(212,202,184,0.4)' }}
+      >
+        <div className="flex items-baseline gap-0">
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 300, letterSpacing: '0.35em', color: 'var(--ink)', textTransform: 'uppercase' }}>
+            Atlas
+          </span>
+          <span style={{ fontFamily: 'var(--font-ui)', fontSize: 8, fontWeight: 300, letterSpacing: '0.3em', color: 'var(--slate)', textTransform: 'uppercase', marginLeft: 8, paddingLeft: 8, borderLeft: '1px solid var(--stone)' }}>
+            by Forme
+          </span>
         </div>
       </header>
 
       {/* Mobile bottom tab bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-atlas-border" style={{ height: 64, backgroundColor: '#FAF7F2' }}>
+      <div
+        className="md:hidden fixed bottom-0 left-0 right-0 z-[1000]"
+        style={{ height: 64, background: 'rgba(250,247,242,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(212,202,184,0.4)' }}
+      >
         <div className="flex items-center justify-around h-full px-2">
           {mobileTabs.map((tab) => {
             const Icon = tab.icon;
             const active = isActive(location.pathname, tab.to);
             return (
-              <Link key={tab.to} to={tab.to} className="flex flex-col items-center justify-center gap-1 flex-1 h-full relative">
-                <Icon size={20} strokeWidth={active ? 1.5 : 1} className={active ? 'text-atlas-text' : 'text-atlas-soft'} />
-                <span className={`text-[9px] tracking-[0.1em] uppercase ${active ? 'text-atlas-text' : 'text-atlas-soft'}`} style={{ fontWeight: active ? 400 : 300 }}>{tab.label}</span>
+              <Link key={tab.to} to={tab.to} className="flex flex-col items-center justify-center gap-1 flex-1 h-full">
+                <Icon size={18} strokeWidth={active ? 1.5 : 1} style={{ color: active ? 'var(--ink)' : 'var(--stone)' }} />
+                <span style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: active ? 400 : 300, letterSpacing: '0.15em', textTransform: 'uppercase', color: active ? 'var(--ink)' : 'var(--stone)' }}>
+                  {tab.label}
+                </span>
               </Link>
             );
           })}
-          <button onClick={() => setMoreOpen(true)} className="flex flex-col items-center justify-center gap-1 flex-1 h-full relative">
-            <Menu size={20} strokeWidth={isMoreActive ? 1.5 : 1} className={isMoreActive ? 'text-atlas-text' : 'text-atlas-soft'} />
-            <span className={`text-[9px] tracking-[0.1em] uppercase ${isMoreActive ? 'text-atlas-text' : 'text-atlas-soft'}`} style={{ fontWeight: isMoreActive ? 400 : 300 }}>More</span>
+          <button onClick={() => setMoreOpen(true)} className="flex flex-col items-center justify-center gap-1 flex-1 h-full">
+            <Menu size={18} strokeWidth={isMoreActive ? 1.5 : 1} style={{ color: isMoreActive ? 'var(--ink)' : 'var(--stone)' }} />
+            <span style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: isMoreActive ? 400 : 300, letterSpacing: '0.15em', textTransform: 'uppercase', color: isMoreActive ? 'var(--ink)' : 'var(--stone)' }}>
+              More
+            </span>
           </button>
         </div>
       </div>
 
       {/* More drawer */}
       {moreOpen && (
-        <div className="md:hidden fixed inset-0 z-[60]">
-          <div className="absolute inset-0 bg-black/20" onClick={() => setMoreOpen(false)} />
-          <div className="absolute bottom-0 left-0 right-0 bg-atlas-surface" style={{ boxShadow: '0 -8px 40px rgba(13,13,11,0.08)' }}>
-            <div className="flex items-center justify-between px-6 pt-6 pb-4">
-              <span className="font-display text-xl font-light text-atlas-text">More</span>
-              <button onClick={() => setMoreOpen(false)} className="w-8 h-8 flex items-center justify-center text-atlas-soft hover:text-atlas-text transition-colors">
+        <div className="md:hidden fixed inset-0 z-[1100]">
+          <div className="absolute inset-0" style={{ background: 'rgba(28,26,23,0.6)' }} onClick={() => setMoreOpen(false)} />
+          <div className="absolute bottom-0 left-0 right-0" style={{ background: 'var(--cream)', borderTop: '1px solid var(--stone)' }}>
+            <div className="flex items-center justify-between px-8 pt-8 pb-4">
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--ink)' }}>More</span>
+              <button onClick={() => setMoreOpen(false)} style={{ color: 'var(--slate)' }} className="hover:opacity-70">
                 <X size={18} strokeWidth={1} />
               </button>
             </div>
-            <div className="px-6 pb-10 space-y-1">
+            <div className="px-8 pb-12">
               {moreLinks.map((link) => {
                 const Icon = link.icon;
                 const active = isActive(location.pathname, link.to);
                 return (
-                  <Link key={link.to} to={link.to} onClick={() => setMoreOpen(false)} className={`flex items-center gap-4 px-0 py-4 border-b border-atlas-border/50 transition-colors ${active ? 'text-atlas-text' : 'text-atlas-sub hover:text-atlas-text'}`}>
-                    <Icon size={18} strokeWidth={1} />
-                    <span className="text-[11px] tracking-[0.15em] uppercase" style={{ fontWeight: active ? 400 : 300 }}>{link.label}</span>
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    onClick={() => setMoreOpen(false)}
+                    className="flex items-center gap-4 py-5"
+                    style={{ borderBottom: '1px solid var(--sand)', color: active ? 'var(--ink)' : 'var(--slate)', textDecoration: 'none' }}
+                  >
+                    <Icon size={16} strokeWidth={1} />
+                    <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: active ? 400 : 300, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+                      {link.label}
+                    </span>
                   </Link>
                 );
               })}

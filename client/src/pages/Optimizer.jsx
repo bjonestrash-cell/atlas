@@ -43,7 +43,7 @@ export default function Optimizer() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-atlas-text">Points vs. Cash</h1>
+      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 300, color: 'var(--ink)' }}>Points vs. Cash</h1>
 
       <div className="card">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-atlas-muted mb-4">Trip Details</h2>

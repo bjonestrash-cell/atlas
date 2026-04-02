@@ -103,7 +103,7 @@ export default function Alerts() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-atlas-text">Alerts & News</h1>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 300, color: 'var(--ink)' }}>Alerts & News</h1>
         <button onClick={() => setShowModal(true)} className="btn-primary">+ Price Alert</button>
       </div>
 
@@ -179,7 +179,7 @@ export default function Alerts() {
 
       {/* Promotions & News — Tabbed */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-atlas-text">Promotions & News</h2>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 300, color: 'var(--ink)' }}>Promotions & News</h2>
         <button
           onClick={handleRefresh}
           disabled={promoLoading}

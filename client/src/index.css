@@ -2,77 +2,107 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #FAF7F2;
-  color: #0D0D0B;
-  font-family: system-ui, -apple-system, sans-serif;
-  font-weight: 300;
-  font-size: 15px;
-  line-height: 1.8;
+:root {
+  --ink: #1C1A17;
+  --ink-soft: #3D3930;
+  --parchment: #F7F3EE;
+  --sand: #EDE7DC;
+  --stone: #D4CAB8;
+  --bronze: #8B6F47;
+  --bronze-hover: #A08455;
+  --mist: #F2EDE5;
+  --slate: #7A7060;
+  --cream: #FAF7F2;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-ui: 'Jost', system-ui, sans-serif;
+  --transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-fast: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+* { box-sizing: border-box; }
+
+html {
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-weight: 300;
+  line-height: 1.6;
+}
+
 ::selection {
-  background: #E8DFD0;
-  color: #0D0D0B;
+  background: var(--bronze);
+  color: var(--cream);
 }
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #C4B9A8; border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: #8C7355; }
+::-webkit-scrollbar-thumb { background: var(--stone); }
+::-webkit-scrollbar-thumb:hover { background: var(--bronze); }
 
 h1, h2, h3 {
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: var(--font-display);
   font-weight: 300;
-  letter-spacing: -0.01em;
 }
 
 input, select, textarea {
-  background-color: transparent;
-  border: 1px solid #C4B9A8;
-  color: #0D0D0B;
-  border-radius: 1px;
-  padding: 12px 16px;
-  font-size: 14px;
-  font-family: system-ui, -apple-system, sans-serif;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--stone);
+  border-radius: 0;
+  padding: 12px 0;
+  font-family: var(--font-ui);
+  font-size: 15px;
   font-weight: 300;
+  color: var(--ink);
+  width: 100%;
   outline: none;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s;
 }
 input:focus, select:focus, textarea:focus {
-  border-color: #8C7355;
+  border-bottom-color: var(--bronze);
 }
 input::placeholder, textarea::placeholder {
-  color: #C4B9A8;
+  color: var(--stone);
   font-weight: 300;
+}
+select {
+  cursor: pointer;
 }
 
 .card {
-  background-color: #F0EBE1;
-  border: 1px solid #E8DFD0;
-  border-radius: 2px;
-  padding: 28px;
+  background: var(--mist);
+  border: 1px solid var(--sand);
+  border-radius: 0;
+  padding: 32px;
+  transition: border-color 0.4s, box-shadow 0.4s;
+}
+.card:hover {
+  border-color: var(--stone);
 }
 
 .btn-primary {
-  background-color: #8C7355;
-  color: #FAF7F2;
+  background: transparent;
+  border: 1px solid var(--bronze);
+  border-radius: 0;
+  padding: 12px 32px;
+  font-family: var(--font-ui);
+  font-size: 10px;
   font-weight: 400;
-  font-size: 11px;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
-  padding: 14px 28px;
-  border-radius: 1px;
-  transition: all 0.3s ease;
-  border: 1px solid #8C7355;
+  color: var(--bronze);
   cursor: pointer;
-  font-family: system-ui, -apple-system, sans-serif;
+  transition: var(--transition-fast);
 }
 .btn-primary:hover {
-  background-color: #B39370;
-  border-color: #B39370;
+  background: var(--bronze);
+  color: var(--cream);
 }
 .btn-primary:disabled {
   opacity: 0.35;
@@ -80,116 +110,114 @@ input::placeholder, textarea::placeholder {
 }
 
 .btn-secondary {
-  background-color: transparent;
-  border: 1px solid #C4B9A8;
-  color: #0D0D0B;
+  background: transparent;
+  border: 1px solid var(--stone);
+  border-radius: 0;
+  padding: 12px 32px;
+  font-family: var(--font-ui);
+  font-size: 10px;
   font-weight: 400;
-  font-size: 11px;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
-  padding: 14px 28px;
-  border-radius: 1px;
-  transition: all 0.3s ease;
+  color: var(--slate);
   cursor: pointer;
-  font-family: system-ui, -apple-system, sans-serif;
+  transition: var(--transition-fast);
 }
 .btn-secondary:hover {
-  border-color: #8C7355;
-  color: #8C7355;
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 .btn-danger {
-  background-color: transparent;
-  border: 1px solid #C4B9A8;
-  color: #9B5B4F;
+  background: transparent;
+  border: 1px solid var(--stone);
+  border-radius: 0;
+  padding: 12px 32px;
+  font-family: var(--font-ui);
+  font-size: 10px;
   font-weight: 400;
-  font-size: 11px;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
-  padding: 14px 28px;
-  border-radius: 1px;
-  transition: all 0.3s ease;
+  color: #9B5B4F;
   cursor: pointer;
-  font-family: system-ui, -apple-system, sans-serif;
+  transition: var(--transition-fast);
 }
 .btn-danger:hover {
   border-color: #9B5B4F;
 }
 
 .stat-value {
-  font-size: clamp(32px, 5vw, 48px);
+  font-size: clamp(36px, 4vw, 56px);
   font-weight: 300;
-  color: #0D0D0B;
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  color: var(--ink);
+  font-family: var(--font-display);
   line-height: 1;
   letter-spacing: -0.02em;
 }
 
 .stat-label {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: #C4B9A8;
-  font-family: system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.3em;
+  color: var(--slate);
+  font-family: var(--font-ui);
 }
 
-/* react-datepicker luxury theme */
+.divider {
+  border: none;
+  border-top: 1px solid var(--sand);
+  margin: 64px 0;
+}
+
+/* react-datepicker */
 .atlas-calendar {
-  font-family: system-ui, -apple-system, sans-serif !important;
-  background-color: #F0EBE1 !important;
-  border: 1px solid #C4B9A8 !important;
-  border-radius: 2px !important;
-  box-shadow: 0 12px 40px rgba(13,13,11,0.08) !important;
+  font-family: var(--font-ui) !important;
+  background: var(--mist) !important;
+  border: 1px solid var(--stone) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 16px 48px rgba(28,26,23,0.06) !important;
   padding: 16px !important;
 }
 .atlas-calendar .react-datepicker__header {
-  background-color: #F0EBE1 !important;
-  border-bottom: 1px solid #E8DFD0 !important;
+  background: var(--mist) !important;
+  border-bottom: 1px solid var(--sand) !important;
   padding-bottom: 12px !important;
 }
 .atlas-calendar .react-datepicker__current-month {
-  color: #0D0D0B !important;
-  font-family: 'Cormorant Garamond', Georgia, serif !important;
-  font-weight: 400 !important;
+  color: var(--ink) !important;
+  font-family: var(--font-display) !important;
+  font-weight: 300 !important;
   font-size: 18px !important;
   letter-spacing: 0.02em !important;
 }
 .atlas-calendar .react-datepicker__day-name {
-  color: #C4B9A8 !important;
-  font-size: 10px !important;
+  color: var(--stone) !important;
+  font-size: 9px !important;
   font-weight: 400 !important;
-  letter-spacing: 0.1em !important;
+  letter-spacing: 0.15em !important;
   text-transform: uppercase !important;
 }
 .atlas-calendar .react-datepicker__day {
-  color: #0D0D0B !important;
-  border-radius: 1px !important;
+  color: var(--ink) !important;
+  border-radius: 0 !important;
   font-weight: 300 !important;
 }
-.atlas-calendar .react-datepicker__day:hover {
-  background-color: #E8DFD0 !important;
-}
+.atlas-calendar .react-datepicker__day:hover { background: var(--sand) !important; }
 .atlas-calendar .react-datepicker__day--selected,
 .atlas-calendar .react-datepicker__day--keyboard-selected {
-  background-color: #8C7355 !important;
-  color: #FAF7F2 !important;
+  background: var(--bronze) !important;
+  color: var(--cream) !important;
 }
-.atlas-calendar .react-datepicker__day--today {
-  font-weight: 400 !important;
-  color: #8C7355 !important;
-}
-.atlas-calendar .react-datepicker__day--today.react-datepicker__day--selected {
-  color: #FAF7F2 !important;
-}
-.atlas-calendar .react-datepicker__day--disabled { color: #E8DFD0 !important; }
-.atlas-calendar .react-datepicker__navigation-icon::before { border-color: #C4B9A8 !important; }
-.atlas-calendar .react-datepicker__day--outside-month { color: #E8DFD0 !important; }
+.atlas-calendar .react-datepicker__day--today { font-weight: 400 !important; color: var(--bronze) !important; }
+.atlas-calendar .react-datepicker__day--today.react-datepicker__day--selected { color: var(--cream) !important; }
+.atlas-calendar .react-datepicker__day--disabled { color: var(--sand) !important; }
+.atlas-calendar .react-datepicker__navigation-icon::before { border-color: var(--stone) !important; }
+.atlas-calendar .react-datepicker__day--outside-month { color: var(--sand) !important; }
 .react-datepicker-popper { z-index: 30 !important; }
 .react-datepicker__triangle { display: none !important; }
 
-/* Thin divider utility */
-.divider {
-  height: 1px;
-  background: #E8DFD0;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }

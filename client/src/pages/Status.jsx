@@ -107,9 +107,9 @@ function BottomSheet({ open, onClose, children }) {
   }, [open]);
   return (
     <div className={`fixed inset-0 z-50 transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-      <div className="absolute inset-0 bg-black/20" onClick={onClose} />
-      <div className={`absolute bottom-0 left-0 right-0 bg-atlas-surface max-h-[92vh] flex flex-col transition-transform duration-300 ease-out ${open ? 'translate-y-0' : 'translate-y-full'}`} style={{ boxShadow: '0 -8px 40px rgba(13,13,11,0.1)' }}>
-        <div className="flex justify-center pt-3 pb-1"><div className="w-10 h-1 rounded-full bg-atlas-border" /></div>
+      <div className="absolute inset-0" style={{ background: 'rgba(28,26,23,0.6)' }} onClick={onClose} />
+      <div className={`absolute bottom-0 left-0 right-0 max-h-[92vh] flex flex-col transition-transform duration-300 ease-out ${open ? 'translate-y-0' : 'translate-y-full'}`} style={{ background: 'var(--cream)', borderTop: '1px solid var(--stone)', boxShadow: '0 -16px 48px rgba(28,26,23,0.06)' }}>
+        <div className="flex justify-center pt-3 pb-1"><div className="w-10 h-px" style={{ background: 'var(--stone)' }} /></div>
         {children}
       </div>
     </div>
@@ -223,30 +223,29 @@ export default function Status() {
   const editAlliance = AIRLINE_ALLIANCE[editName] || '';
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-atlas-text">Loyalty Status</h1>
+    <div>
+      <div className="flex items-center justify-between mb-16">
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 300, color: 'var(--ink)' }}>Loyalty Status</h1>
         <button onClick={openAddSheet} className="btn-primary flex items-center gap-2">
-          <Plus size={18} /> Add Status
+          <Plus size={14} strokeWidth={1} /> Add Status
         </button>
       </div>
 
       {/* Hero */}
-      <div className="card text-center">
-        <div className="stat-label mb-2">Active Statuses</div>
-        <div className="text-5xl font-extrabold text-atlas-text tracking-tight">{totalCount}</div>
-        <div className="text-sm text-atlas-muted mt-2">
+      <div className="text-center mb-16" style={{ borderTop: '1px solid var(--stone)', borderBottom: '1px solid var(--stone)', padding: '48px 0' }}>
+        <div className="stat-label mb-4">Active Statuses</div>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 300, color: 'var(--ink)', lineHeight: 1 }}>{totalCount}</div>
+        <div className="mt-4" style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: 'var(--slate)' }}>
           {totalCount > 0 ? `across ${CAT_ORDER.filter((c) => activeStatuses.some((s) => s.category === c)).length} categories` : 'Add your first loyalty status to get started'}
         </div>
       </div>
 
       {/* Empty state */}
       {totalCount === 0 && (
-        <div className="text-center py-12">
-          <Award size={48} className="mx-auto text-atlas-border mb-4" />
-          <p className="text-atlas-muted font-medium mb-4">No loyalty statuses added yet</p>
-          <button onClick={openAddSheet} className="btn-secondary inline-flex items-center gap-2">
-            <Plus size={16} /> Add Your First Status
+        <div className="text-center py-20">
+          <p style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, fontStyle: 'italic', color: 'var(--slate)', marginBottom: 24 }}>No statuses recorded.</p>
+          <button onClick={openAddSheet} className="btn-primary inline-flex items-center gap-2">
+            <Plus size={14} strokeWidth={1} /> Add Your First Status
           </button>
         </div>
       )}
@@ -259,7 +258,7 @@ export default function Status() {
         const CatIcon = config.Icon;
         return (
           <div key={cat}>
-            <h2 className="stat-label mb-3 flex items-center gap-1.5"><CatIcon size={14} /> {config.label}</h2>
+            <h2 className="stat-label mb-4 flex items-center gap-2"><CatIcon size={12} strokeWidth={1} /> {config.label}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {catStatuses.map((s) => {
                 const daysLeft = s.expiration_date ? daysUntil(s.expiration_date) : null;
@@ -269,23 +268,25 @@ export default function Status() {
                   <button
                     key={s.name}
                     onClick={() => openEditSheet(s.name)}
-                    className="bg-atlas-surface p-4 shadow-sm border-l-4 text-left w-full hover:shadow-md transition-shadow"
-                    style={{ borderLeftColor: config.color }}
+                    className="text-left w-full transition-all"
+                    style={{ background: 'var(--mist)', border: '1px solid var(--sand)', borderLeft: '1px solid ' + config.color, padding: 24 }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--stone)'; e.currentTarget.style.boxShadow = '0 16px 48px rgba(28,26,23,0.06)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--sand)'; e.currentTarget.style.borderLeftColor = config.color; e.currentTarget.style.boxShadow = 'none'; }}
                   >
-                    <div className="flex items-start justify-between mb-1.5">
+                    <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
-                        <div className="font-bold text-atlas-text text-sm truncate">{s.name}</div>
+                        <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 400, color: 'var(--ink)' }} className="truncate">{s.name}</div>
                         {cat === 'airline' && alliance && alliance !== 'None' && (
-                          <span className="text-[10px] bg-atlas-bg px-1.5 py-0.5 rounded-pill text-atlas-sub">{alliance}</span>
+                          <span style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--slate)', border: '1px solid var(--stone)', padding: '2px 8px', display: 'inline-block', marginTop: 4 }}>{alliance}</span>
                         )}
                       </div>
                       {expiring && (
-                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-pill shrink-0 ${daysLeft <= 30 ? 'bg-red-50 text-atlas-danger' : 'bg-yellow-50 text-yellow-700'}`}>{daysLeft}d</span>
+                        <span style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.15em', textTransform: 'uppercase', color: daysLeft <= 30 ? '#9B5B4F' : 'var(--slate)', border: '1px solid var(--stone)', padding: '2px 8px' }}>{daysLeft}d</span>
                       )}
                     </div>
-                    <div className="text-xl font-extrabold text-atlas-text mb-0.5">{s.status_level}</div>
-                    {s.expiration_date && <div className="text-xs text-atlas-muted">Expires {s.expiration_date}</div>}
-                    {s.notes && <div className="text-xs text-atlas-muted mt-0.5 truncate">{s.notes}</div>}
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 300, color: 'var(--ink)', marginBottom: 4 }}>{s.status_level}</div>
+                    {s.expiration_date && <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: 'var(--slate)' }}>Expires {s.expiration_date}</div>}
+                    {s.notes && <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: 'var(--slate)', marginTop: 2 }} className="truncate">{s.notes}</div>}
                   </button>
                 );
               })}
@@ -299,7 +300,7 @@ export default function Status() {
         {sheetMode === 'pick' ? (
           <div className="flex flex-col overflow-hidden">
             <div className="px-5 pb-3 pt-2">
-              <h2 className="text-lg font-bold text-atlas-text mb-3">Add Loyalty Status</h2>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--ink)', marginBottom: 16 }}>Add Loyalty Status</h2>
               <div className="relative">
                 <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-atlas-muted" />
                 <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search programs..." className="w-full !pl-10 !py-3.5 text-base" autoFocus />
@@ -345,7 +346,7 @@ export default function Status() {
           <div className="px-5 pb-8 pt-2">
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="text-lg font-bold text-atlas-text">{editName}</h2>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 400, color: 'var(--ink)' }}>{editName}</h2>
                 <div className="text-xs text-atlas-muted">
                   {CAT_CONFIG[editProgramDef?.category]?.label || ''}
                   {editAlliance && editAlliance !== 'None' ? ` · ${editAlliance}` : ''}

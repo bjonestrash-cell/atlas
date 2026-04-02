@@ -16,7 +16,6 @@ function fuzzyMatch(query, text) {
 function searchAirports(query) {
   if (!query || query.length < 1) return [];
   const q = query.trim();
-
   const scored = airports.map((a) => {
     const iataScore = a.iata.toLowerCase() === q.toLowerCase() ? 10 :
                       a.iata.toLowerCase().startsWith(q.toLowerCase()) ? 6 : 0;
@@ -25,7 +24,6 @@ function searchAirports(query) {
     const score = Math.max(iataScore, cityScore * 1.5, nameScore);
     return { ...a, score };
   }).filter((a) => a.score > 0);
-
   scored.sort((a, b) => b.score - a.score);
   return scored.slice(0, 8);
 }
@@ -45,7 +43,6 @@ export default function AirportAutocomplete({ value, onChange, placeholder, labe
   const inputRef = useRef(null);
   const listRef = useRef(null);
 
-  // Sync if parent resets value externally
   useEffect(() => {
     if (value !== selectedIata) {
       setSelectedIata(value || '');
@@ -75,53 +72,27 @@ export default function AirportAutocomplete({ value, onChange, placeholder, labe
 
   const handleKeyDown = (e) => {
     if (!open || results.length === 0) return;
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setActiveIndex((i) => Math.min(i + 1, results.length - 1));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setActiveIndex((i) => Math.max(i - 1, 0));
-    } else if (e.key === 'Enter' && activeIndex >= 0) {
-      e.preventDefault();
-      selectAirport(results[activeIndex]);
-    } else if (e.key === 'Escape') {
-      setOpen(false);
-    }
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActiveIndex((i) => Math.min(i + 1, results.length - 1)); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActiveIndex((i) => Math.max(i - 1, 0)); }
+    else if (e.key === 'Enter' && activeIndex >= 0) { e.preventDefault(); selectAirport(results[activeIndex]); }
+    else if (e.key === 'Escape') { setOpen(false); }
   };
 
-  const handleBlur = () => {
-    setTimeout(() => setOpen(false), 150);
-  };
-
+  const handleBlur = () => { setTimeout(() => setOpen(false), 150); };
   const handleFocus = () => {
-    // Select all text on focus so user can type over
-    if (selectedIata) {
-      inputRef.current?.select();
-    }
-    if (query && !selectedIata) {
-      const matches = searchAirports(query);
-      setResults(matches);
-      setOpen(matches.length > 0);
-    }
+    if (selectedIata) inputRef.current?.select();
+    if (query && !selectedIata) { const m = searchAirports(query); setResults(m); setOpen(m.length > 0); }
   };
 
   useEffect(() => {
-    if (activeIndex >= 0 && listRef.current) {
-      const items = listRef.current.children;
-      if (items[activeIndex]) {
-        items[activeIndex].scrollIntoView({ block: 'nearest' });
-      }
+    if (activeIndex >= 0 && listRef.current?.children?.[activeIndex]) {
+      listRef.current.children[activeIndex].scrollIntoView({ block: 'nearest' });
     }
   }, [activeIndex]);
 
   return (
     <div className="relative">
-      {label && (
-        <label className="block text-xs font-semibold text-atlas-muted mb-1 uppercase tracking-wider">
-          {label}
-        </label>
-      )}
+      {label && <label className="stat-label block mb-2">{label}</label>}
       <input
         ref={inputRef}
         type="text"
@@ -137,22 +108,27 @@ export default function AirportAutocomplete({ value, onChange, placeholder, labe
       {open && results.length > 0 && (
         <div
           ref={listRef}
-          className="absolute z-40 top-full left-0 right-0 mt-1 max-h-56 overflow-y-auto rounded-lg border border-atlas-border"
-          style={{ backgroundColor: '#fff', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}
+          className="absolute z-40 top-full left-0 right-0 mt-1 max-h-56 overflow-y-auto"
+          style={{ background: 'var(--cream)', border: '1px solid var(--stone)', boxShadow: '0 16px 48px rgba(28,26,23,0.06)' }}
         >
           {results.map((airport, i) => (
             <div
               key={airport.iata}
               onMouseDown={() => selectAirport(airport)}
-              className={`px-3 py-2.5 cursor-pointer flex items-center justify-between transition-colors ${
-                i === activeIndex ? 'bg-atlas-accent/10' : 'hover:bg-atlas-tertiary'
-              } ${i > 0 ? 'border-t border-atlas-border/50' : ''}`}
+              className="cursor-pointer flex items-center justify-between transition-colors"
+              style={{
+                padding: '10px 16px',
+                background: i === activeIndex ? 'var(--sand)' : 'transparent',
+                borderTop: i > 0 ? '1px solid var(--sand)' : 'none',
+              }}
+              onMouseEnter={(e) => { if (i !== activeIndex) e.currentTarget.style.background = 'var(--mist)'; }}
+              onMouseLeave={(e) => { if (i !== activeIndex) e.currentTarget.style.background = 'transparent'; }}
             >
               <div>
-                <span className="text-sm font-medium text-atlas-text">{airport.city}</span>
-                <span className="text-sm text-atlas-muted"> — {airport.name}</span>
+                <span style={{ fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 300, color: 'var(--ink)' }}>{airport.city}</span>
+                <span style={{ fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 300, color: 'var(--slate)' }}> — {airport.name}</span>
               </div>
-              <span className="text-xs font-semibold text-atlas-accent ml-2 shrink-0">{airport.iata}</span>
+              <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 400, letterSpacing: '0.15em', color: 'var(--bronze)' }}>{airport.iata}</span>
             </div>
           ))}
         </div>
