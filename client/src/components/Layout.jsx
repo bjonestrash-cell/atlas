@@ -4,9 +4,11 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen" style={{ background: 'var(--cream)' }}>
       <Navbar />
-      <main className="max-w-6xl mx-auto px-6 md:px-16 pt-28 md:pt-32 pb-28 md:pb-20">
+      <main style={{ maxWidth: 1200, margin: '0 auto', padding: '120px 64px 96px' }}>
         {children}
       </main>
+      {/* Mobile padding override */}
+      <style>{`@media (max-width: 767px) { main { padding: 100px 24px 80px !important; } }`}</style>
     </div>
   );
 }

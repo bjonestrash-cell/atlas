@@ -86,8 +86,8 @@ export default function Destinations() {
                   {trip.airline && <span>Airline: {trip.airline}</span>}
                   {trip.travel_class && <span className="text-atlas-muted">{trip.travel_class}</span>}
                   {trip.trip_type && <span className="text-atlas-muted capitalize">{trip.trip_type}</span>}
-                  {trip.alliance && <span className="text-xs bg-atlas-bg px-2 py-0.5 rounded-pill text-atlas-sub">{trip.alliance}</span>}
-                  {trip.ticket_cost > 0 && <span className="font-semibold">{formatCurrency(trip.ticket_cost)}</span>}
+                  {trip.alliance && <span className="text-xs bg-atlas-bg px-2 py-0.5 border border-atlas-border text-atlas-sub">{trip.alliance}</span>}
+                  {trip.ticket_cost > 0 && <span className="font-normal">{formatCurrency(trip.ticket_cost)}</span>}
                   <span className="capitalize text-atlas-muted">{trip.purpose}</span>
                 </div>
                 {trip.notes && <div className="text-atlas-muted text-xs mt-1">{trip.notes}</div>}

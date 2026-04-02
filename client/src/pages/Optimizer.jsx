@@ -46,10 +46,10 @@ export default function Optimizer() {
       <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 300, color: 'var(--ink)' }}>Points vs. Cash</h1>
 
       <div className="card">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-atlas-muted mb-4">Trip Details</h2>
+        <h2 className="text-xs font-normal uppercase tracking-wider text-atlas-muted mb-4">Trip Details</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-atlas-muted mb-1 uppercase tracking-wider">Select Trip (optional)</label>
+            <label className="block text-xs font-normal text-atlas-muted mb-1 uppercase tracking-wider">Select Trip (optional)</label>
             <select value={selectedTrip} onChange={(e) => setSelectedTrip(e.target.value)} className="w-full">
               <option value="">— Manual entry —</option>
               {activeTrips.map((t) => (
@@ -60,11 +60,11 @@ export default function Optimizer() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-atlas-muted mb-1 uppercase tracking-wider">Cash Price (USD) *</label>
+              <label className="block text-xs font-normal text-atlas-muted mb-1 uppercase tracking-wider">Cash Price (USD) *</label>
               <input type="number" value={cashPrice} onChange={(e) => setCashPrice(e.target.value)} placeholder="500" className="w-full" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-atlas-muted mb-1 uppercase tracking-wider">Points Program *</label>
+              <label className="block text-xs font-normal text-atlas-muted mb-1 uppercase tracking-wider">Points Program *</label>
               <select value={selectedProgram} onChange={(e) => setSelectedProgram(e.target.value)} className="w-full">
                 <option value="">Select program</option>
                 {programs.map((p) => (
@@ -73,7 +73,7 @@ export default function Optimizer() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-atlas-muted mb-1 uppercase tracking-wider">Points Needed *</label>
+              <label className="block text-xs font-normal text-atlas-muted mb-1 uppercase tracking-wider">Points Needed *</label>
               <input type="number" value={pointsNeeded} onChange={(e) => setPointsNeeded(e.target.value)} placeholder="25000" className="w-full" />
             </div>
           </div>
@@ -102,40 +102,40 @@ export default function Optimizer() {
           </div>
 
           <div className="card">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-atlas-muted mb-4">Side-by-Side Comparison</h3>
+            <h3 className="text-xs font-normal uppercase tracking-wider text-atlas-muted mb-4">Side-by-Side Comparison</h3>
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-atlas-border">
-                  <th className="text-left py-2 text-atlas-muted text-xs font-semibold uppercase tracking-wider"></th>
-                  <th className="text-right py-2 text-atlas-muted text-xs font-semibold uppercase tracking-wider">Pay Cash</th>
-                  <th className="text-right py-2 text-atlas-muted text-xs font-semibold uppercase tracking-wider">Use Points</th>
+                  <th className="text-left py-2 text-atlas-muted text-xs font-normal uppercase tracking-wider"></th>
+                  <th className="text-right py-2 text-atlas-muted text-xs font-normal uppercase tracking-wider">Pay Cash</th>
+                  <th className="text-right py-2 text-atlas-muted text-xs font-normal uppercase tracking-wider">Use Points</th>
                 </tr>
               </thead>
               <tbody className="text-atlas-text">
                 <tr className="border-b border-atlas-border/50">
                   <td className="py-3 text-atlas-sub">Cost</td>
-                  <td className="py-3 text-right font-display font-semibold">{formatCurrency(cash)}</td>
-                  <td className="py-3 text-right font-display font-semibold">{formatPoints(points)} pts</td>
+                  <td className="py-3 text-right font-display font-normal">{formatCurrency(cash)}</td>
+                  <td className="py-3 text-right font-display font-normal">{formatPoints(points)} pts</td>
                 </tr>
                 <tr className="border-b border-atlas-border/50">
                   <td className="py-3 text-atlas-sub">Estimated Value</td>
-                  <td className="py-3 text-right font-display font-semibold">{formatCurrency(cash)}</td>
-                  <td className="py-3 text-right font-display font-semibold">{formatCurrency(analysis.pointsValueDollars)}</td>
+                  <td className="py-3 text-right font-display font-normal">{formatCurrency(cash)}</td>
+                  <td className="py-3 text-right font-display font-normal">{formatCurrency(analysis.pointsValueDollars)}</td>
                 </tr>
                 <tr className="border-b border-atlas-border/50">
                   <td className="py-3 text-atlas-sub">Effective CPP</td>
                   <td className="py-3 text-right">—</td>
-                  <td className="py-3 text-right font-display font-semibold">{analysis.effectiveCpp.toFixed(2)}¢</td>
+                  <td className="py-3 text-right font-display font-normal">{analysis.effectiveCpp.toFixed(2)}¢</td>
                 </tr>
                 <tr className="border-b border-atlas-border/50">
                   <td className="py-3 text-atlas-sub">Program Baseline CPP</td>
                   <td className="py-3 text-right">—</td>
-                  <td className="py-3 text-right font-display font-semibold">{program.cpp}¢</td>
+                  <td className="py-3 text-right font-display font-normal">{program.cpp}¢</td>
                 </tr>
                 <tr>
                   <td className="py-3 text-atlas-sub">Available Balance</td>
                   <td className="py-3 text-right">—</td>
-                  <td className={`py-3 text-right font-display font-semibold ${analysis.hasEnoughPoints ? 'text-atlas-success' : 'text-atlas-danger'}`}>
+                  <td className={`py-3 text-right font-display font-normal ${analysis.hasEnoughPoints ? 'text-atlas-success' : 'text-atlas-danger'}`}>
                     {formatPoints(program.balance)} pts
                   </td>
                 </tr>

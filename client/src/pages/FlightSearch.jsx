@@ -134,9 +134,9 @@ export default function FlightSearch() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 300, color: 'var(--ink)' }}>Flights</h1>
-        <div className="flex rounded-btn overflow-hidden border border-atlas-border">
-          <button type="button" onClick={() => setMode('cash')} className={`px-5 py-2 text-sm font-semibold transition-colors ${mode === 'cash' ? 'bg-atlas-accent text-white' : 'bg-white text-atlas-sub'}`}>Cash</button>
-          <button type="button" onClick={() => setMode('points')} className={`px-5 py-2 text-sm font-semibold transition-colors ${mode === 'points' ? 'bg-atlas-accent text-white' : 'bg-white text-atlas-sub'}`}>Points</button>
+        <div className="flex overflow-hidden overflow-hidden border border-atlas-border">
+          <button type="button" onClick={() => setMode('cash')} className={`px-5 py-2 text-sm font-normal transition-colors ${mode === 'cash' ? 'bg-atlas-accent text-white' : 'bg-white text-atlas-sub'}`}>Cash</button>
+          <button type="button" onClick={() => setMode('points')} className={`px-5 py-2 text-sm font-normal transition-colors ${mode === 'points' ? 'bg-atlas-accent text-white' : 'bg-white text-atlas-sub'}`}>Points</button>
         </div>
       </div>
 
@@ -240,9 +240,9 @@ export default function FlightSearch() {
               <div key={flight.id} className="card flex items-center justify-between gap-4">
                 <div className="flex items-center gap-5 flex-1">
                   <div className="text-center min-w-[80px]">
-                    <div className="text-sm font-bold text-atlas-text">{flight.airline}</div>
+                    <div className="text-sm font-normal text-atlas-text">{flight.airline}</div>
                     {flight.flightNumber && <div className="text-xs text-atlas-muted">{flight.flightNumber}</div>}
-                    <span className={`inline-block mt-1 text-xs font-semibold px-2.5 py-0.5 rounded-pill ${flight.stops === 0 ? 'bg-atlas-green-light text-atlas-green-dark' : 'bg-atlas-bg text-atlas-sub'}`}>
+                    <span className={`inline-block mt-1 text-xs font-normal px-2.5 py-0.5 border border-atlas-border ${flight.stops === 0 ? 'bg-atlas-green-light text-atlas-green-dark' : 'bg-atlas-bg text-atlas-sub'}`}>
                       {flight.stops === 0 ? 'Nonstop' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}
                     </span>
                   </div>
@@ -259,10 +259,10 @@ export default function FlightSearch() {
                 <div className="text-right shrink-0">
                   {mode === 'points' && pointsNeeded ? (
                     <>
-                      <div className="text-xl font-extrabold text-atlas-success">{formatPoints(pointsNeeded)} pts</div>
+                      <div className="text-xl font-normal text-atlas-success">{formatPoints(pointsNeeded)} pts</div>
                       <div className="text-xs text-atlas-muted">{formatCurrency(flight.price)} cash</div>
                       {isGoodDeal !== null && (
-                        <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-pill mt-1 inline-block ${isGoodDeal ? 'bg-atlas-green-light text-atlas-green-dark' : 'bg-red-50 text-atlas-danger'}`}>
+                        <span className={`text-xs font-normal px-2.5 py-0.5 border border-atlas-border mt-1 inline-block ${isGoodDeal ? 'bg-atlas-green-light text-atlas-green-dark' : 'bg-red-50 text-atlas-danger'}`}>
                           {isGoodDeal ? 'Good deal' : 'Poor deal'}
                         </span>
                       )}
@@ -270,13 +270,13 @@ export default function FlightSearch() {
                   ) : (
                     <>
                       {flight.price ? (
-                        <div className="text-2xl font-extrabold text-atlas-text">{formatCurrency(flight.price)}</div>
+                        <div className="text-2xl font-normal text-atlas-text">{formatCurrency(flight.price)}</div>
                       ) : (
                         <div className="text-sm text-atlas-muted">Price N/A</div>
                       )}
                       <button
                         onClick={() => setSaved(flight.id)}
-                        className={`text-xs font-semibold mt-1 px-3 py-1 rounded-pill transition-colors ${saved === flight.id ? 'bg-atlas-green-light text-atlas-green-dark' : 'bg-atlas-accent text-white hover:bg-atlas-accent-hover'}`}
+                        className={`text-xs font-normal mt-1 px-3 py-1 border border-atlas-border transition-colors ${saved === flight.id ? 'bg-atlas-green-light text-atlas-green-dark' : 'bg-atlas-accent text-white hover:bg-atlas-accent-hover'}`}
                       >
                         {saved === flight.id ? 'Saved!' : 'Save to trip'}
                       </button>

@@ -320,9 +320,9 @@ export default function PointsManager() {
             <div className="flex justify-center gap-5 flex-wrap">
               {CAT_ORDER.map((cat) => totals[cat] > 0 ? (
                 <div key={cat} className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: CAT_CONFIG[cat].color }} />
+                  <div className="w-2.5 h-2.5 w-0.5" style={{ backgroundColor: CAT_CONFIG[cat].color }} />
                   <span className="text-xs text-atlas-muted">{CAT_CONFIG[cat].label}</span>
-                  <span className="text-xs font-bold text-atlas-text">{formatCurrency(totals[cat])}</span>
+                  <span className="text-xs font-normal text-atlas-text">{formatCurrency(totals[cat])}</span>
                 </div>
               ) : null)}
             </div>
@@ -399,8 +399,8 @@ export default function PointsManager() {
                 if (items.length === 0) return null;
                 return (
                   <div key={cat} className="mb-4">
-                    <div className="text-xs font-bold uppercase tracking-wider text-atlas-muted mb-1.5 flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: CAT_CONFIG[cat].color }} />
+                    <div className="text-xs font-normal uppercase tracking-wider text-atlas-muted mb-1.5 flex items-center gap-2">
+                      <div className="w-2 h-2 w-0.5" style={{ backgroundColor: CAT_CONFIG[cat].color }} />
                       {CAT_CONFIG[cat].label}
                     </div>
                     {items.map((prog) => {
@@ -409,14 +409,14 @@ export default function PointsManager() {
                         <button
                           key={prog.name}
                           onClick={() => selectProgram(prog.name)}
-                          className="w-full flex items-center justify-between px-3 py-3.5 rounded-2xl hover:bg-atlas-bg transition-colors text-left"
+                          className="w-full flex items-center justify-between px-3 py-3.5 transition-colors hover:bg-atlas-bg transition-colors text-left"
                         >
                           <div>
-                            <div className="text-sm font-semibold text-atlas-text">{prog.name}</div>
+                            <div className="text-sm font-normal text-atlas-text">{prog.name}</div>
                             <div className="text-xs text-atlas-muted">{prog.cpp}¢ per point</div>
                           </div>
                           <div className="flex items-center gap-2">
-                            {hasBalance && <span className="text-xs font-semibold text-atlas-success">{fmtCommas(programs[prog.name].balance)} pts</span>}
+                            {hasBalance && <span className="text-xs font-normal text-atlas-success">{fmtCommas(programs[prog.name].balance)} pts</span>}
                             <ChevronRight size={16} className="text-atlas-border" />
                           </div>
                         </button>
@@ -447,10 +447,10 @@ export default function PointsManager() {
                   value={editBalance}
                   onChange={(e) => setEditBalance(e.target.value.replace(/[^0-9]/g, ''))}
                   placeholder="0"
-                  className="w-full text-3xl font-extrabold !py-4 text-center"
+                  className="w-full text-3xl font-normal !py-4 text-center"
                 />
                 {parseBal(editBalance) > 0 && editProgramDef && (
-                  <div className="text-center mt-2 text-sm font-semibold text-atlas-success">
+                  <div className="text-center mt-2 text-sm font-normal text-atlas-success">
                     ≈ {formatCurrency(editCashValue)}
                   </div>
                 )}
@@ -466,7 +466,7 @@ export default function PointsManager() {
               </button>
 
               {programs[editName]?.balance > 0 && (
-                <button onClick={handleDelete} className="w-full flex items-center justify-center gap-2 py-3 text-atlas-danger text-sm font-semibold hover:bg-red-50 rounded-2xl transition-colors">
+                <button onClick={handleDelete} className="w-full flex items-center justify-center gap-2 py-3 text-atlas-danger text-sm font-normal hover:bg-red-50 transition-colors transition-colors">
                   <Trash2 size={16} /> Remove Program
                 </button>
               )}

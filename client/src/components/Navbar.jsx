@@ -42,13 +42,13 @@ export default function Navbar() {
       {/* Desktop nav — fixed, frosted glass */}
       <nav
         className="hidden md:flex items-center justify-between fixed top-0 left-0 right-0 z-[1000] h-14 px-12"
-        style={{ background: 'rgba(250,247,242,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(212,202,184,0.4)' }}
+        style={{ background: 'rgba(250,247,242,0.97)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(212,202,184,0.6)' }}
       >
         <Link to="/" className="flex items-baseline gap-0">
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 300, letterSpacing: '0.35em', color: 'var(--ink)', textTransform: 'uppercase' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 300, letterSpacing: '0.4em', color: '#1C1A17', textTransform: 'uppercase' }}>
             Atlas
           </span>
-          <span style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 300, letterSpacing: '0.3em', color: 'var(--slate)', textTransform: 'uppercase', marginLeft: 12, paddingLeft: 12, borderLeft: '1px solid var(--stone)' }}>
+          <span style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 300, letterSpacing: '0.25em', color: '#7A7060', textTransform: 'uppercase', marginLeft: 12, paddingLeft: 12, borderLeft: '1px solid #D4CAB8' }}>
             by Forme
           </span>
         </Link>
@@ -61,14 +61,14 @@ export default function Navbar() {
                 to={link.to}
                 className="transition-colors"
                 style={{
-                  fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 400, letterSpacing: '0.2em',
+                  fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 400, letterSpacing: '0.18em',
                   textTransform: 'uppercase', textDecoration: 'none', padding: '0 16px',
-                  color: active ? 'var(--ink)' : 'var(--slate)',
-                  borderBottom: active ? '1px solid var(--bronze)' : '1px solid transparent',
+                  color: active ? '#1C1A17' : '#3D3930',
+                  borderBottom: active ? '1px solid #8B6F47' : '1px solid transparent',
                   paddingBottom: 2,
                 }}
-                onMouseEnter={(e) => { if (!active) e.target.style.color = 'var(--bronze)'; }}
-                onMouseLeave={(e) => { if (!active) e.target.style.color = 'var(--slate)'; }}
+                onMouseEnter={(e) => { if (!active) e.target.style.color = '#8B6F47'; }}
+                onMouseLeave={(e) => { if (!active) e.target.style.color = '#3D3930'; }}
               >
                 {link.label}
               </Link>
@@ -80,7 +80,7 @@ export default function Navbar() {
       {/* Mobile header */}
       <header
         className="md:hidden fixed top-0 left-0 right-0 z-[1000] flex items-center justify-center h-14"
-        style={{ background: 'rgba(250,247,242,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(212,202,184,0.4)' }}
+        style={{ background: 'rgba(250,247,242,0.97)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(212,202,184,0.6)' }}
       >
         <div className="flex items-baseline gap-0">
           <span style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 300, letterSpacing: '0.35em', color: 'var(--ink)', textTransform: 'uppercase' }}>

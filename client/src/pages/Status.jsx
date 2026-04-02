@@ -316,22 +316,22 @@ export default function Status() {
                 const config = CAT_CONFIG[cat];
                 return (
                   <div key={cat} className="mb-4">
-                    <div className="text-xs font-bold uppercase tracking-wider text-atlas-muted mb-1.5 flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: config.color }} />
+                    <div className="text-xs font-normal uppercase tracking-wider text-atlas-muted mb-1.5 flex items-center gap-2">
+                      <div className="w-2 h-2 w-0.5" style={{ backgroundColor: config.color }} />
                       {config.label}
                     </div>
                     {items.map((prog) => {
                       const hasStatus = !!statuses[prog.name]?.status_level;
                       return (
-                        <button key={prog.name} onClick={() => selectProgram(prog.name)} className="w-full flex items-center justify-between px-3 py-3.5 rounded-2xl hover:bg-atlas-bg transition-colors text-left">
+                        <button key={prog.name} onClick={() => selectProgram(prog.name)} className="w-full flex items-center justify-between px-3 py-3.5 transition-colors hover:bg-atlas-bg transition-colors text-left">
                           <div>
-                            <div className="text-sm font-semibold text-atlas-text">{prog.name}</div>
+                            <div className="text-sm font-normal text-atlas-text">{prog.name}</div>
                             {AIRLINE_ALLIANCE[prog.name] && AIRLINE_ALLIANCE[prog.name] !== 'None' && (
                               <div className="text-xs text-atlas-muted">{AIRLINE_ALLIANCE[prog.name]}</div>
                             )}
                           </div>
                           <div className="flex items-center gap-2">
-                            {hasStatus && <span className="text-xs font-semibold text-atlas-success">{statuses[prog.name].status_level}</span>}
+                            {hasStatus && <span className="text-xs font-normal text-atlas-success">{statuses[prog.name].status_level}</span>}
                             <ChevronRight size={16} className="text-atlas-border" />
                           </div>
                         </button>
@@ -359,12 +359,12 @@ export default function Status() {
               <div>
                 <label className="stat-label block mb-2">Status Level</label>
                 {editTiers.length > 0 ? (
-                  <select value={editLevel} onChange={(e) => setEditLevel(e.target.value)} className="w-full !py-3.5 text-base font-semibold">
+                  <select value={editLevel} onChange={(e) => setEditLevel(e.target.value)} className="w-full !py-3.5 text-base font-normal">
                     <option value="">Select tier...</option>
                     {editTiers.map((t) => <option key={t} value={t}>{t}</option>)}
                   </select>
                 ) : (
-                  <input type="text" value={editLevel} onChange={(e) => setEditLevel(e.target.value)} placeholder="e.g. Gold, Platinum" className="w-full !py-3.5 text-base font-semibold" />
+                  <input type="text" value={editLevel} onChange={(e) => setEditLevel(e.target.value)} placeholder="e.g. Gold, Platinum" className="w-full !py-3.5 text-base font-normal" />
                 )}
               </div>
 
@@ -381,7 +381,7 @@ export default function Status() {
               <button onClick={handleSave} disabled={!editLevel} className="btn-primary w-full !py-4 text-base mt-2">Save</button>
 
               {statuses[editName]?.status_level && (
-                <button onClick={handleDelete} className="w-full flex items-center justify-center gap-2 py-3 text-atlas-danger text-sm font-semibold hover:bg-red-50 rounded-2xl transition-colors">
+                <button onClick={handleDelete} className="w-full flex items-center justify-center gap-2 py-3 text-atlas-danger text-sm font-normal hover:bg-red-50 transition-colors transition-colors">
                   <Trash2 size={16} /> Remove Status
                 </button>
               )}

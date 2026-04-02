@@ -113,14 +113,14 @@ export default function Alerts() {
           <h2 className="stat-label mb-3 text-atlas-warning">Points Expiration Warnings</h2>
           <div className="space-y-2">
             {expirationWarnings.map((p) => (
-              <div key={p.id} className={`flex items-center justify-between p-3 rounded-2xl ${
+              <div key={p.id} className={`flex items-center justify-between p-3 transition-colors ${
                 p.urgency === 'critical' ? 'bg-red-50' : p.urgency === 'warning' ? 'bg-yellow-50' : 'bg-atlas-bg'
               }`}>
                 <div>
-                  <span className="font-semibold text-atlas-text text-sm">{p.program_name}</span>
+                  <span className="font-normal text-atlas-text text-sm">{p.program_name}</span>
                   <span className="text-xs text-atlas-muted ml-2">{formatPoints(p.balance)} pts</span>
                 </div>
-                <span className={`text-xs font-bold ${
+                <span className={`text-xs font-normal ${
                   p.urgency === 'critical' ? 'text-atlas-danger' : p.urgency === 'warning' ? 'text-yellow-700' : 'text-atlas-muted'
                 }`}>
                   {p.daysLeft === 0 ? 'Expires today!' : `${p.daysLeft}d left`}
@@ -141,26 +141,26 @@ export default function Alerts() {
             {alerts.map((alert) => {
               const isTriggered = alert.current_price && alert.current_price <= alert.target_price;
               return (
-                <div key={alert.id} className={`flex items-center justify-between p-3 rounded-2xl ${
+                <div key={alert.id} className={`flex items-center justify-between p-3 transition-colors ${
                   isTriggered ? 'bg-green-50' : !alert.active ? 'bg-atlas-bg opacity-50' : 'bg-atlas-bg'
                 }`}>
                   <div className="flex items-center gap-4 flex-wrap">
                     <div>
-                      <div className="font-semibold text-atlas-text text-sm">{alert.origin} → {alert.destination}</div>
+                      <div className="font-normal text-atlas-text text-sm">{alert.origin} → {alert.destination}</div>
                       {alert.date && <div className="text-xs text-atlas-muted">{formatDate(alert.date)}</div>}
                     </div>
                     <div className="text-xs">
                       <span className="text-atlas-muted">Target: </span>
-                      <span className="font-bold text-atlas-text">{formatCurrency(alert.target_price)}</span>
+                      <span className="font-normal text-atlas-text">{formatCurrency(alert.target_price)}</span>
                     </div>
                     {alert.current_price && (
                       <div className="text-xs">
                         <span className="text-atlas-muted">Now: </span>
-                        <span className={`font-bold ${isTriggered ? 'text-atlas-success' : 'text-atlas-text'}`}>{formatCurrency(alert.current_price)}</span>
+                        <span className={`font-normal ${isTriggered ? 'text-atlas-success' : 'text-atlas-text'}`}>{formatCurrency(alert.current_price)}</span>
                       </div>
                     )}
                     {isTriggered && (
-                      <span className="text-[10px] font-bold bg-atlas-green-light text-atlas-green-dark px-2 py-0.5 rounded-pill">PRICE DROP</span>
+                      <span className="text-[10px] font-normal bg-atlas-green-light text-atlas-green-dark px-2 py-0.5 border border-atlas-border">PRICE DROP</span>
                     )}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
@@ -231,7 +231,7 @@ export default function Alerts() {
       {!promoLoading && activeTab === 'favorites' && favoritesList.length === 0 && (
         <div className="card text-center py-10">
           <Star size={36} className="mx-auto text-atlas-border mb-3" />
-          <p className="text-sm font-semibold text-atlas-text mb-1">No favorites yet</p>
+          <p className="text-sm font-normal text-atlas-text mb-1">No favorites yet</p>
           <p className="text-xs text-atlas-muted">Star a program in your Points Portfolio or Loyalty Status to see personalized news here.</p>
         </div>
       )}
@@ -252,9 +252,9 @@ export default function Alerts() {
             return catNews.map((group) => (
               <div key={group.program} className="card">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-1 h-6 rounded-full" style={{ backgroundColor: CAT_CONFIG[cat]?.color || '#999' }} />
+                  <div className="w-1 h-6 w-0.5" style={{ backgroundColor: CAT_CONFIG[cat]?.color || '#999' }} />
                   <div>
-                    <div className="text-sm font-bold text-atlas-text">{group.program}</div>
+                    <div className="text-sm font-normal text-atlas-text">{group.program}</div>
                     <div className="text-[10px] text-atlas-muted uppercase tracking-wider">{CAT_CONFIG[cat]?.label}</div>
                   </div>
                 </div>
@@ -265,11 +265,11 @@ export default function Alerts() {
                       href={item.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block p-3 rounded-2xl bg-atlas-bg hover:bg-atlas-border/50 transition-colors group"
+                      className="block p-3 transition-colors bg-atlas-bg hover:bg-atlas-border/50 transition-colors group"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-semibold text-atlas-text group-hover:text-atlas-accent truncate">{item.title}</div>
+                          <div className="text-sm font-normal text-atlas-text group-hover:text-atlas-accent truncate">{item.title}</div>
                           {item.snippet && <div className="text-xs text-atlas-muted mt-0.5 line-clamp-2">{item.snippet}</div>}
                           <div className="text-[10px] text-atlas-muted mt-1">
                             {item.source}{item.date ? ` · ${item.date}` : ''}

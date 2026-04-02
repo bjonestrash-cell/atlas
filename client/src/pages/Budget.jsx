@@ -104,12 +104,12 @@ export default function Budget() {
               const actual = summary.byCategory.find((c) => c.category === cat && c.type === 'actual');
               const pct = planned && planned.total > 0 ? ((actual?.total || 0) / planned.total) * 100 : 0;
               return (
-                <div key={cat} className="p-4 rounded-2xl bg-atlas-bg">
+                <div key={cat} className="p-4 border border-atlas-border bg-atlas-bg">
                   <div className="stat-label mb-2">{cat}</div>
-                  <div className="text-2xl font-extrabold text-atlas-text">{formatCurrency(actual?.total || 0)}</div>
+                  <div className="text-2xl font-normal text-atlas-text">{formatCurrency(actual?.total || 0)}</div>
                   <div className="text-xs text-atlas-muted mt-1">of {formatCurrency(planned?.total || 0)} planned</div>
-                  <div className="w-full bg-atlas-border rounded-full h-1.5 mt-3">
-                    <div className={`h-1.5 rounded-full ${pct > 100 ? 'bg-atlas-danger' : 'bg-atlas-accent'}`} style={{ width: `${Math.min(pct, 100)}%` }} />
+                  <div className="w-full bg-atlas-border w-full h-1.5 mt-3">
+                    <div className={`h-1.5 w-full ${pct > 100 ? 'bg-atlas-danger' : 'bg-atlas-accent'}`} style={{ width: `${Math.min(pct, 100)}%` }} />
                   </div>
                 </div>
               );
@@ -141,9 +141,9 @@ export default function Budget() {
                     <td className="py-3 text-atlas-text font-medium">{formatMonth(e.month)}</td>
                     <td className="py-3 text-atlas-text">{e.category}</td>
                     <td className="py-3">
-                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-pill ${e.type === 'planned' ? 'bg-atlas-bg text-atlas-sub' : 'bg-atlas-green-light text-atlas-green-dark'}`}>{e.type}</span>
+                      <span className={`text-xs font-normal px-2.5 py-1 border border-atlas-border ${e.type === 'planned' ? 'bg-atlas-bg text-atlas-sub' : 'bg-atlas-green-light text-atlas-green-dark'}`}>{e.type}</span>
                     </td>
-                    <td className="py-3 text-right font-bold text-atlas-text">{formatCurrency(e.amount)}</td>
+                    <td className="py-3 text-right font-normal text-atlas-text">{formatCurrency(e.amount)}</td>
                     <td className="py-3 text-atlas-muted text-xs">{e.notes}</td>
                     <td className="py-3 text-right">
                       <button onClick={() => handleDelete(e.id)} className="text-xs text-atlas-danger hover:underline font-medium">Delete</button>
